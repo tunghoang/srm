@@ -1,0 +1,352 @@
+title: Student research management
+name: srm
+version: 1.0
+server_name: localhost:8000
+salt: fitresact
+connection_string: mysql+pymysql://root:newpass123@172.17.0.1/srm
+namespaces:
+  - ns_name: quotas
+    ns_description: quotas namespace (quotas for bachelor, master, phD, PGS, ...)
+    resource_name: quota
+    props:
+      - name: idQuota
+        type: Integer
+        primary_key: yes
+      - name: name
+        type: String
+        type_specs: (100)
+      - name: description
+        type: String
+        type_specs: (255)
+      - name: n_kltn
+        type: Integer
+      - name: n_dakh
+        type: Integer
+    list_api: list quotas
+    list_api_description: list quotas
+    new_api: create quota
+    new_api_description: create quota
+    update_api: edit quota
+    update_api_description: edit quota
+    delete_api: delete quota
+    delete_api_description: delete quota
+    find_api: find quotas
+    find_api_description: find quotas
+  - ns_name: guestadvisors
+    ns_description: guest advisor namespace
+    resource_name: guestadvisor
+    props:
+      - name: idGuestadvisor
+        type: Integer
+        primary_key: yes
+      - name: email
+        type: String
+        type_specs: (100)
+      - name: fullname
+        type: String
+        type_specs: (200)
+      - name: affiliation
+        type: String
+        type_specs: (255)
+      - name: password
+        type: String
+        type_specs: (100)
+    list_api: list guest advisors
+    list_api_description: list guest advisors
+    new_api: create guest advisor
+    new_api_description: create guest advisor
+    update_api: edit guest advisor
+    update_api_description: edit guest advisor
+    delete_api: delete guest advisor
+    delete_api_description: delete guest advisor
+    find_api: find guest advisors
+    find_api_description: find guest advisors
+  - ns_name: advisors
+    ns_description: advisors namespace
+    resource_name: advisor
+    props:
+      - name: idAdvisor
+        type: Integer
+        primary_key: yes
+      - name: email
+        type: String
+        type_specs: (100)
+      - name: fullname
+        type: String
+        type_specs: (200)
+      - name: idQuota
+        type: Integer
+        foreign_key: quota.idQuota
+      - name: idGuestadvisor
+        type: Integer
+        foreign_key: guestadvisor.idGuestadvisor
+    list_api: list advisors
+    list_api_description: list advisors
+    new_api: create advisor
+    new_api_description: create advisor
+    update_api: edit advisor
+    update_api_description: edit advisor
+    delete_api: delete advisor
+    delete_api_description: delete advisor
+    find_api: find advisors
+    find_api_description: find advisors
+  - ns_name: staffs
+    ns_description: staffs namespace
+    resource_name: staff
+    props:
+      - name: idStaff
+        type: Integer
+        primary_key: yes
+      - name: email
+        type: String
+        type_specs: (100)
+      - name: fullname
+        type: String
+        type_specs: (200)
+    list_api: list staffs
+    list_api_description: list staffs
+    new_api: create staff
+    new_api_description: create staff
+    update_api: edit staff
+    update_api_description: edit staff
+    delete_api: delete staff
+    delete_api_description: delete staff
+    find_api: find staffs
+    find_api_description: find staffs
+  - ns_name: students
+    ns_description: students namespace
+    resource_name: student
+    props:
+      - name: idStudent
+        type: Integer
+        primary_key: yes
+      - name: studentNumber
+        type: Integer
+      - name: email
+        type: String
+        type_specs: (100)
+      - name: fullname
+        type: String
+        type_specs: (150)
+      - name: dob
+        type: Date
+      - name: gender
+        type: Boolean
+    list_api: list students
+    list_api_description: list students
+    new_api: create student
+    new_api_description: create student
+    update_api: edit student
+    update_api_description: edit student
+    delete_api: delete student
+    delete_api_description: delete student
+    find_api: find students
+    find_api_description: find students
+  - ns_name: semesters
+    ns_description: semesters namespace (hoc ky)
+    resource_name: semester
+    props:
+      - name: idSemester
+        type: Integer
+        primary_key: yes
+      - name: year
+        type: Integer
+      - name: semesterIndex
+        type: Integer
+    list_api: list semesters
+    list_api_description: list semesters
+    new_api: create semester
+    new_api_description: create semester
+    update_api: edit semester
+    update_api_description: edit semester
+    delete_api: delete semester
+    delete_api_description: delete semester
+    find_api: find semesters
+    find_api_description: find semesters
+  - ns_name: projecttypes
+    ns_description: project types (KLTN, Du an, NCKH)
+    resource_name: projecttype
+    props:
+      - name: idProjecttype
+        type: Integer
+        primary_key: yes
+      - name: name
+        type: String
+        type_specs: (30)
+      - name: description
+        type: String
+        type_specs: (255)
+    list_api: list projecttypes
+    list_api_description: list projecttypes
+    new_api: create projecttype
+    new_api_description: create projecttype
+    update_api: edit projecttype
+    update_api_description: edit projecttype
+    delete_api: delete projecttype
+    delete_api_description: delete projecttype
+    find_api: find projecttypes
+    find_api_description: find projecttypes
+  - ns_name: projects
+    ns_description: projects namespace
+    resource_name: project
+    props:
+      - name: idProject
+        type: Integer
+        primary_key: yes
+      - name: title
+        type: Text
+      - name: idProjecttype
+        type: Integer
+        foreign_key: projecttype.idProjecttype
+      - name: idSemester
+        type: Integer
+        foreign_key: semester.idSemester
+      - name: status
+        type: String
+        type_specs: (20)
+      - name: grade
+        type: Float
+    list_api: list projects
+    list_api_description: list projects
+    new_api: create project
+    new_api_description: create project
+    update_api: edit project
+    update_api_description: edit project
+    delete_api: delete project
+    delete_api_description: delete project
+    find_api: find projects
+    find_api_description: find projects
+  - ns_name: attachments
+    ns_description: attachments namespace (bao cao, presentation, source code, ...)
+    resource_name: attachment
+    props:
+      - name: idAttachment
+        type: Integer
+        primary_key: yes
+      - name: title
+        type: String
+        type_specs: (255)
+      - name: uuid
+        type: String
+        type_specs: (50)
+      - name: idProject
+        type: Integer
+        foreign_key: project.idProject
+      - name: idOwner
+        type: Integer
+        foreign_key: student.idStudent
+      - name: uploadDate
+        type: DateTime
+    list_api: list attachments
+    list_api_description: list attachments
+    new_api: create attachment
+    new_api_description: create attachment
+    update_api: edit attachment
+    update_api_description: edit attachment
+    delete_api: delete attachment
+    delete_api_description: delete attachment
+    find_api: find attachments
+    find_api_description: find attachments
+  - ns_name: projectStudentRels
+    ns_description: project-Student Relationship
+    resource_name: projectStudentRel
+    props:
+      - name: idProjectStudentRel
+        type: Integer
+        primary_key: yes
+      - name: idStudent
+        type: Integer
+        foreign_key: student.idStudent
+      - name: idProject
+        type: Integer
+        foreign_key: project.idProject
+      - name: status
+        type: Integer
+    list_api: list project student rel
+    list_api_description: list project student rels
+    new_api: create project student rel
+    new_api_description: create project student rel
+    update_api: edit project student rel
+    update_api_description: edit project student rel
+    delete_api: delete project student rel
+    delete_api_description: delete project student rel
+    find_api: find projectstudent rels
+    find_api_description: find projectstudent rels
+  - ns_name: projectAdvisorRels
+    ns_description: project-Advisor Relationship
+    resource_name: projectAdvisorRel
+    props:
+      - name: idProjectAdvisorRel
+        type: Integer
+        primary_key: yes
+      - name: idAdvisor
+        type: Integer
+        foreign_key: advisor.idAdvisor
+      - name: idProject
+        type: Integer
+        foreign_key: project.idProject
+      - name: status
+        type: Integer
+    list_api: list project advisor rel
+    list_api_description: list project advisor rels
+    new_api: create project advisor rel
+    new_api_description: create project advisor rel
+    update_api: edit project advisor rel
+    update_api_description: edit project advisor rel
+    delete_api: delete project advisor rel
+    delete_api_description: delete project advisor rel
+    find_api: find projectadvisor rels
+    find_api_description: find projectadvisor rels
+  - ns_name: stafflogin
+    ns_description: login for staff
+    resource_name: stafflogin
+    nodb: yes
+    props:
+      - name: email
+        type: String
+      - name: password
+        type: String
+    new_api: do login
+    new_api_description: do login
+  - ns_name: advisorlogin
+    ns_description: login for advisor
+    resource_name: advisorlogin
+    nodb: yes
+    props:
+      - name: email
+        type: String
+      - name: password
+        type: String
+    new_api: do login
+    new_api_description: do login
+  - ns_name: guestlogin
+    ns_description: login for guest
+    resource_name: guestlogin
+    nodb: yes
+    props:
+      - name: email
+        type: String
+      - name: password
+        type: String
+    new_api: do login
+    new_api_description: do login
+  - ns_name: studentlogin
+    ns_description: login for student
+    resource_name: studentlogin
+    nodb: yes
+    props:
+      - name: email
+        type: String
+      - name: password
+        type: String
+    new_api: do login
+    new_api_description: do login
+  - ns_name: logout
+    ns_description: logout
+    resource_name: logout
+    nodb: yes
+    props:
+      - name: email
+        type: String
+    list_api: do logout
+    list_api_description: do login

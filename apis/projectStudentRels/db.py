@@ -1,0 +1,158 @@
+from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy.schema import UniqueConstraint
+from sqlalchemy.orm import relationship
+from sqlalchemy.exc import *
+from ..db_utils import DbInstance
+from ..app_utils import *
+from werkzeug.exceptions import *
+from flask import session,request,after_this_request
+
+__db = DbInstance.getInstance()
+
+
+
+class Projectstudentrel(__db.Base):
+  __tablename__ = "projectStudentRel"
+  idProjectStudentRel = Column(Integer, primary_key = True)
+  idStudent = Column(Integer, ForeignKey('student.idStudent'))
+  idProject = Column(Integer, ForeignKey('project.idProject'))
+  status = Column(Integer)
+
+  constraints = list()
+  if len(constraints) > 0:
+    __table_args__ = tuple(constraints)
+ 
+  def __init__(self, dictModel):
+    if ("idProjectStudentRel" in dictModel) and (dictModel["idProjectStudentRel"] != None):
+      self.idProjectStudentRel = dictModel["idProjectStudentRel"]
+    if ("idStudent" in dictModel) and (dictModel["idStudent"] != None):
+      self.idStudent = dictModel["idStudent"]
+    if ("idProject" in dictModel) and (dictModel["idProject"] != None):
+      self.idProject = dictModel["idProject"]
+    if ("status" in dictModel) and (dictModel["status"] != None):
+      self.status = dictModel["status"]
+
+  def __repr__(self):
+    return '<Projectstudentrel idProjectStudentRel={} idStudent={} idProject={} status={} >'.format(self.idProjectStudentRel, self.idStudent, self.idProject, self.status, )
+
+  def json(self):
+    return {
+      "idProjectStudentRel":self.idProjectStudentRel,"idStudent":self.idStudent,"idProject":self.idProject,"status":self.status,
+    }
+
+  def update(self, dictModel):
+    if ("idProjectStudentRel" in dictModel) and (dictModel["idProjectStudentRel"] != None):
+      self.idProjectStudentRel = dictModel["idProjectStudentRel"]
+    if ("idStudent" in dictModel) and (dictModel["idStudent"] != None):
+      self.idStudent = dictModel["idStudent"]
+    if ("idProject" in dictModel) and (dictModel["idProject"] != None):
+      self.idProject = dictModel["idProject"]
+    if ("status" in dictModel) and (dictModel["status"] != None):
+      self.status = dictModel["status"]
+
+def __recover():
+  __db.newSession()
+
+def __doList():
+  return __db.session().query(Projectstudentrel).all()
+  
+def __doNew(instance):
+  __db.session().add(instance)
+  __db.session().commit()
+  return instance
+
+def __doGet(id):
+  instance = __db.session().query(Projectstudentrel).filter(Projectstudentrel.idProjectstudentrel == id).scalar()
+  doLog("__doGet: {}".format(instance))
+  return instance
+
+def __doUpdate(id, model):
+  instance = getProjectstudentrel(id)
+  if instance == None:
+    return {}
+  instance.update(model)
+  __db.session().commit()
+  return instance
+def __doDelete(id):
+  instance = getProjectstudentrel(id)
+  __db.session().delete(instance)
+  __db.session().commit()
+  return instance
+def __doFind(model):
+  results = __db.session().query(Projectstudentrel).filter_by(**model).all()
+  return results
+
+
+def listProjectstudentrels():
+  doLog("list DAO function")
+  try:
+    return __doList()
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doList()
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
+
+def newProjectstudentrel(model):
+  doLog("new DAO function. model: {}".format(model))
+  instance = Projectstudentrel(model)
+  res = False
+  try:
+    return __doNew(instance)
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doNew(instance)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
+
+def getProjectstudentrel(id):
+  doLog("get DAO function", id)
+  try:
+    return __doGet(id)
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doGet(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
+
+def updateProjectstudentrel(id, model):
+  doLog("update DAO function. Model: {}".format(model))
+  try:
+    return __doUpdate(id, model)
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doUpdate(id, model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
+
+def deleteProjectstudentrel(id):
+  doLog("delete DAO function", id)
+  try:
+    return __doDelete(id)
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doDelete(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
+
+def findProjectstudentrel(model):
+  doLog("find DAO function %s" % model)
+  try:
+    return __doFind(model)
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doFind(model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
