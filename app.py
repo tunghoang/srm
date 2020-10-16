@@ -9,8 +9,10 @@ import os
 
 db = DbInstance.getInstance()
 
-app = Flask("srm")
-app.wsgi_app = ProxyFix(app.wsgi_app)
+app = Flask(__name__)
+#app.wsgi_app = ProxyFix(app.wsgi_app)
+app.config['DEBUG'] = False
+app.config['JSON_AS_ASCII'] = False
 app.config['SERVER_NAME'] = "localhost:8000"
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = '/tmp'
@@ -25,8 +27,9 @@ def before_request():
   jwt = request.cookies.get('jwt')
   key = key if key is not None else request.headers.get('auth-key')
   jwt = jwt if jwt is not None else request.headers.get('authorization')
-  no_auth_routes = ( '/', '/favicon.ico', '/swagger.json', )
-  no_auth_prefixes = ( '/swaggerui', '/studentlogin' )
+  no_auth_routes = ('/', '/favicon.ico', '/swagger.json' )
+  no_auth_prefixes = ( '/swaggerui', '/')
+  #no_auth_prefixes = ( '/swaggerui', '/studentlogin' )
 
   if request.path in no_auth_routes or matchOneOf(request.path, no_auth_prefixes) :
     return None
