@@ -72,8 +72,8 @@ def studentNumberFromEmail(email):
 
 def __doNew(instance):
   studentNumber = studentNumberFromEmail(instance.email)
-  studentRecord = doAuthenticate(studentNumber, instance.password)
-  if studentRecord is None:
+  success, studentRecord = doAuthenticate(studentNumber, instance.password)
+  if not sucess:
     raise BadRequest("Authentication failed")
   else:
     student = __db.session().query(Student).filter(Student.studentNumber == studentNumber).first()
