@@ -73,7 +73,7 @@ def studentNumberFromEmail(email):
 def __doNew(instance):
   studentNumber = studentNumberFromEmail(instance.email)
   success, data = doAuthenticate(studentNumber, instance.password)
-  if not sucess:
+  if not success:
     raise BadRequest(data)
   else:
     studentRecord = data
