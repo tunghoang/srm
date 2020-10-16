@@ -72,10 +72,11 @@ def studentNumberFromEmail(email):
 
 def __doNew(instance):
   studentNumber = studentNumberFromEmail(instance.email)
-  success, studentRecord = doAuthenticate(studentNumber, instance.password)
+  success, data = doAuthenticate(studentNumber, instance.password)
   if not sucess:
-    raise BadRequest("Authentication failed")
+    raise BadRequest(data)
   else:
+    studentRecord = data
     student = __db.session().query(Student).filter(Student.studentNumber == studentNumber).first()
     if student is None:
       student = Student({
