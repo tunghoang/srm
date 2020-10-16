@@ -8,7 +8,7 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 from ..students import Student
-from ..ldap import search, authenticate, ldapScope
+from ..ldap import search, authenticate
 __db = DbInstance.getInstance()
 
 
@@ -52,7 +52,7 @@ def buildStudentRecordFromLDAPAttrs(attrs):
   }
 
 def doAuthenticate(studentNumber, password):
-  result = search('ou=dhcn,ou=sinhvien,dc=vnu,dc=vn', ldapScope, f'uid={studentNumber}')
+  result = search('ou=dhcn,ou=sinhvien,dc=vnu,dc=vn', f'uid={studentNumber}')
   if len(result) == 0:
     return False, "Student not found"
   dn, attrs = result[0]
