@@ -18,6 +18,7 @@ def _getLDAPConnection():
   return ldapConnection
 
 def search(base, uid):
+  print(base, uid)
   global _ldapConnection
   conn = None
   try:
