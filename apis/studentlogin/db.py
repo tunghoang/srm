@@ -51,8 +51,8 @@ def buildStudentRecordFromLDAPAttrs(attrs):
     'dob': '2000-03-12'
   }
 
-def doAuthenticate(studentNumber, password):
-  result = search('ou=dhcn,ou=sinhvien,dc=vnu,dc=vn', f'uid={studentNumber}')
+def doAuthenticate(uid, password):
+  result = search('ou=dhcn,ou=sinhvien,dc=vnu,dc=vn', uid)
   if len(result) == 0:
     return False, "Student not found"
   dn, attrs = result[0]
@@ -64,23 +64,23 @@ def doAuthenticate(studentNumber, password):
   # MOCK
   #return {'fullname': "Nguyen Van A", "gender": True, 'dob': '2000-03-12'}
 
-def studentNumberFromEmail(email):
+def uidFromEmail(email):
   tokens = email.split('@')
   if len(tokens) != 2:
     raise BadRequest('Not valid email')
   return tokens[0]
 
 def __doNew(instance):
-  studentNumber = studentNumberFromEmail(instance.email)
-  success, data = doAuthenticate(studentNumber, instance.password)
+  uid = uidFromEmail(instance.email)
+  success, data = doAuthenticate(uid, instance.password)
   if not success:
     raise BadRequest(data)
   else:
     studentRecord = data
-    student = __db.session().query(Student).filter(Student.studentNumber == studentNumber).first()
+    student = __db.session().query(Student).filter(Student.studentNumber == uid).first()
     if student is None:
       student = Student({
-        'studentNumber': studentNumber,
+        'studentNumber': uid,
         'email': instance.email,
         'fullname': studentRecord['fullname'],
         'dob': studentRecord['dob'],

@@ -6,6 +6,7 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
+from ..staffs import Staff
 
 __db = DbInstance.getInstance()
 
@@ -39,9 +40,48 @@ def __recover():
 
 def __doList():
   return []
-  
+
+def doAuthenticate(uid, password):
+  result = search('ou=dhcn,ou=canbo,dc=vnu,dc=vn', uid)
+  if len(result) == 0:
+    return False, "Account not found"
+  dn, attrs = result[0]
+  if authenticate(dn, password):
+    return True, {}
+  else:
+    return False, 'Login failed'
+
+  # MOCK
+  #return {'fullname': "Nguyen Van A", "gender": True, 'dob': '2000-03-12'}
+
+def uidFromEmail(email):
+  tokens = email.split('@')
+  if len(tokens) != 2:
+    raise BadRequest('Not valid email')
+  return tokens[0]
+
 def __doNew(instance):
-  return {}
+  uid = uidFromEmail(instance.email)
+  success, data = doAuthenticate(uid, instance.password)
+  if not success:
+    raise BadRequest(data)
+  else:
+    staff = __db.session().query(Staff).filter(Staff.email == instance.email).first()
+    if staff is None:
+      raise BadRequest('Staff not granted')
+    key = doHash(str(instance.email))
+    salt = os.urandom(20)
+    session[key] = salt
+    jwt = doGenJWT(student.json(), salt)
+    @after_this_request
+    def finalize(response):
+      response.set_cookie('key', key)
+      response.set_cookie('jwt', jwt)
+      response.headers['x-key'] = key
+      response.headers['x-jwt'] = jwt
+      return response
+
+    return student
 
 def __doUpdate(id, model):
   return {}
