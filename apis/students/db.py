@@ -43,7 +43,7 @@ class Student(__db.Base):
 
   def json(self):
     return {
-      "idStudent":self.idStudent,"studentNumber":self.studentNumber,"email":self.email,"fullname":self.fullname,"dob":self.dob,"gender":self.gender,
+      "idStudent":self.idStudent,"studentNumber":self.studentNumber,"email":self.email,"fullname":self.fullname,"dob":self.dob.strftime('%d/%m/%y'),"gender":self.gender,
     }
 
   def update(self, dictModel):

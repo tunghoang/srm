@@ -16,6 +16,7 @@ app.config['JSON_AS_ASCII'] = False
 app.config['SERVER_NAME'] = "localhost:8000"
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = '/tmp'
+#app.config['SESSION_COOKIE_SECURE'] = True
 app.secret_key = os.urandom(16)
 api.init_app(app)
 
@@ -28,8 +29,8 @@ def before_request():
   key = key if key is not None else request.headers.get('auth-key')
   jwt = jwt if jwt is not None else request.headers.get('authorization')
   no_auth_routes = ('/', '/favicon.ico', '/swagger.json' )
-  no_auth_prefixes = ( '/swaggerui', '/')
-  #no_auth_prefixes = ( '/swaggerui', '/studentlogin' )
+  #no_auth_prefixes = ( '/swaggerui', '/')
+  no_auth_prefixes = ( '/swaggerui', '/studentlogin', '/stafflogin', '/advisorlogin' )
 
   if request.path in no_auth_routes or matchOneOf(request.path, no_auth_prefixes) :
     return None
@@ -45,6 +46,12 @@ def before_request():
     raise Unauthorized("Not login")
 
   return None
+
+@app.after_request
+def after_request(resp):
+  host = request.headers.get('Host')
+  resp.headers['Access-Control-Allow-Origin'] = 'http://' + host
+  return resp
 
 db.Base.metadata.create_all(db.engine)
 

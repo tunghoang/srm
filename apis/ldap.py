@@ -1,5 +1,7 @@
 import ldap
 _ldapConnection = None
+MAX_RETRIES = 3
+_ldapConnectionRetries = MAX_RETRIES
 _conn_str = 'ldap://112.137.142.11:389'
 _admin = 'cn=admin,dc=vnu,dc=vn'
 _cred = 'abc123'
@@ -14,8 +16,10 @@ def _getLDAPConnection():
   if not _ldapConnection:
     l = ldap.initialize(_conn_str)
     l.bind(_admin, _cred)
-    ldapConnection = l
-  return ldapConnection
+    _ldapConnection = l
+    _ldapConnectionRetries = MAX_RETRIES
+
+  return _ldapConnection
 
 def search(base, uid):
   print(base, uid)
@@ -24,7 +28,12 @@ def search(base, uid):
   try:
     conn = _getLDAPConnection()
   except Exception as e:
-    raise Exception("Cannot connecto to LDAP server: " + e)
+    _ldapConnectionRetries -= 1
+    if _ldapConnectionRetries == 0:
+      raise Exception("Cannot connecto to LDAP server: " + e)
+    else:
+      _ldapConnection = None
+      search(base,uid)
   try:
     result = conn.search_s(base, ldap.SCOPE_SUBTREE, f'uid={uid}')
   except Exception as e:

@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
@@ -73,7 +74,7 @@ def __doNew(instance):
     key = doHash(str(instance.email))
     salt = os.urandom(20)
     session[key] = salt
-    jwt = doGenJWT(student.json(), salt)
+    jwt = doGenJWT(staff.json(), salt)
     @after_this_request
     def finalize(response):
       response.set_cookie('key', key)
@@ -82,7 +83,7 @@ def __doNew(instance):
       response.headers['x-jwt'] = jwt
       return response
 
-    return student
+    return staff
 
 def __doUpdate(id, model):
   return {}

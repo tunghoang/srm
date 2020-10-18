@@ -90,11 +90,12 @@ def __doNew(instance):
     key = doHash(str(instance.email))
     salt = os.urandom(20)
     session[key] = salt
+    doLog(student.json())
     jwt = doGenJWT(student.json(), salt)
     @after_this_request
     def finalize(response):
-      response.set_cookie('key', key)
-      response.set_cookie('jwt', jwt)
+      response.set_cookie('key', key, samesite='Lax', secure=True)
+      response.set_cookie('jwt', jwt, samesite='Lax', secure=True)
       response.headers['x-key'] = key
       response.headers['x-jwt'] = jwt
       return response
