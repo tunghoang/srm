@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
@@ -6,6 +7,8 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
+from ..advisors import Advisor
+from ..ldap import search,authenticate
 
 __db = DbInstance.getInstance()
 
@@ -25,7 +28,7 @@ class Advisorlogin:
 
   def json(self):
     return {
-      "email":self.email,"password":self.password,
+      "email":self.email, "password": self.password,
     }
 
   def update(self, dictModel):
@@ -40,8 +43,46 @@ def __recover():
 def __doList():
   return []
   
+def doAuthenticate(uid, password):
+  result = search('ou=dhcn,ou=canbo,dc=vnu,dc=vn', uid)
+  if len(result) == 0:
+    return False, "Account not found"
+  dn, attrs = result[0]
+  if authenticate(dn, password):
+    return True, buildAdvisorRecordFromLDAPAttrs(attrs)
+  else:
+    return False, 'Login failed'
+
 def __doNew(instance):
-  return {}
+  uid = uidFromEmail(instance.email)
+  success, data = doAuthenticate(uid, instance.password)
+  if not success:
+    raise BadRequest(data)
+  else:
+    advisorRecord = data
+    advisor = __db.session().query(Advisor).filter(Advisor.email == instance.email).first()
+    if advisor is None:
+      advisor = Advisor({
+        'email': instance.email,
+        'fullname': advisorRecord['fullname'],
+        'idQuota': advisorRecord['idQuota'],
+        'idGuestadvisor': advisorRecord['idGuestadvisor']
+      })
+      __db.session().add(advisor)
+    key = doHash(str(instance.email))
+    salt = os.urandom(20)
+    session[key] = salt
+    doLog(advisor.json())
+    jwt = doGenJWT(advisor.json(), salt)
+    @after_this_request
+    def finalize(response):
+      response.set_cookie('key', key)
+      response.set_cookie('jwt', jwt)
+      response.headers['x-key'] = key
+      response.headers['x-jwt'] = jwt
+      return response
+
+    return advisor
 
 def __doUpdate(id, model):
   return {}

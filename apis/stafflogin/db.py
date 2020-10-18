@@ -56,12 +56,6 @@ def doAuthenticate(uid, password):
   # MOCK
   #return {'fullname': "Nguyen Van A", "gender": True, 'dob': '2000-03-12'}
 
-def uidFromEmail(email):
-  tokens = email.split('@')
-  if len(tokens) != 2:
-    raise BadRequest('Not valid email')
-  return tokens[0]
-
 def __doNew(instance):
   uid = uidFromEmail(instance.email)
   success, data = doAuthenticate(uid, instance.password)

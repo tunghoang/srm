@@ -8,6 +8,7 @@ _cred = 'abc123'
 
 ldapScope = ldap.SCOPE_SUBTREE
 def _getLDAPConnection():
+  global _ldapConnectionRetries
   global _ldapConnection
   global _conn_str
   global _admin
@@ -15,6 +16,7 @@ def _getLDAPConnection():
 
   if not _ldapConnection:
     l = ldap.initialize(_conn_str)
+    l.set_option(ldap.OPT_TIMEOUT, 7)
     l.bind(_admin, _cred)
     _ldapConnection = l
     _ldapConnectionRetries = MAX_RETRIES
@@ -23,6 +25,7 @@ def _getLDAPConnection():
 
 def search(base, uid):
   print(base, uid)
+  global _ldapConnectionRetries
   global _ldapConnection
   conn = None
   try:
@@ -51,5 +54,5 @@ def authenticate(dn, cred):
   try:
     conn.bind(dn, cred)
     return True
-  except INVALID_CREDENTIALS as e:
+  except ldap.INVALID_CREDENTIALS as e:
     return False

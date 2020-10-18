@@ -33,6 +33,13 @@ def __recover():
   pass
 
 def __doList():
+  doLog('Logout ---')
+  keys = []
+  for key in session.keys():
+    keys.append(key)
+  for key in keys:
+    session.pop(key)
+  session.clear()
   return []
   
 def __doNew(instance):

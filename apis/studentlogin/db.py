@@ -42,15 +42,6 @@ def __recover():
 def __doList():
   return []
   
-def buildStudentRecordFromLDAPAttrs(attrs):
-  return {
-    'studentNumber': int(attrs['uid'][0].decode('utf-8')), 
-    'email': f"{attrs['uid'][0].decode('utf-8')}@vnu.edu.vn",
-    'fullname':attrs['cn'][0].decode('utf-8'), 
-    'gender':True, 
-    'dob': '2000-03-12'
-  }
-
 def doAuthenticate(uid, password):
   result = search('ou=dhcn,ou=sinhvien,dc=vnu,dc=vn', uid)
   if len(result) == 0:
@@ -63,12 +54,6 @@ def doAuthenticate(uid, password):
 
   # MOCK
   #return {'fullname': "Nguyen Van A", "gender": True, 'dob': '2000-03-12'}
-
-def uidFromEmail(email):
-  tokens = email.split('@')
-  if len(tokens) != 2:
-    raise BadRequest('Not valid email')
-  return tokens[0]
 
 def __doNew(instance):
   uid = uidFromEmail(instance.email)
@@ -94,8 +79,8 @@ def __doNew(instance):
     jwt = doGenJWT(student.json(), salt)
     @after_this_request
     def finalize(response):
-      response.set_cookie('key', key, samesite='Lax', secure=True)
-      response.set_cookie('jwt', jwt, samesite='Lax', secure=True)
+      response.set_cookie('key', key)
+      response.set_cookie('jwt', jwt)
       response.headers['x-key'] = key
       response.headers['x-jwt'] = jwt
       return response
