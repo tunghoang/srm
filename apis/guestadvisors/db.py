@@ -7,6 +7,7 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+from ..advisors import Advisor
 __db = DbInstance.getInstance()
 
 
@@ -62,8 +63,25 @@ def __doList():
   return __db.session().query(Guestadvisor).all()
   
 def __doNew(instance):
-  __db.session().add(instance)
-  __db.session().commit()
+  instance.password = doHash(instance.password)
+  try:
+    __db.session().add(instance)
+    __db.session().commit()
+  except Exception as e:
+    raise e
+
+  advisor = Advisor({
+    'email': instance.email,
+    'fullname': instance.fullname,
+    'idGuestadvisor': instance.idGuestadvisor
+  })
+
+  try:
+    __db.session().add(advisor)
+    __db.session().commit()
+  except Exception as e:
+    raise Exception(f'{e}')
+
   return instance
 
 def __doGet(id):

@@ -62,7 +62,7 @@ def __doNew(instance):
   return instance
 
 def __doGet(id):
-  instance = __db.session().query(Projectstudentrel).filter(Projectstudentrel.idProjectstudentrel == id).scalar()
+  instance = __db.session().query(Projectstudentrel).filter(Projectstudentrel.idProjectStudentRel == id).scalar()
   doLog("__doGet: {}".format(instance))
   return instance
 

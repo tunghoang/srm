@@ -7,6 +7,8 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+from ..projectStudentRels import Projectstudentrel
+
 __db = DbInstance.getInstance()
 
 
@@ -67,8 +69,41 @@ def __doList():
   return __db.session().query(Project).all()
   
 def __doNew(instance):
-  __db.session().add(instance)
-  __db.session().commit()
+  key = request.cookies.get('key')
+  jwt = request.cookies.get('jwt')
+  key = key if key is not None else request.headers.get('auth-key')
+  jwt = jwt if jwt is not None else request.headers.get('authorization')
+
+  sessionData = None
+  if jwt is None or key is None:
+    raise Unauthorized("Invalid request")
+  elif key in session:
+    salt = session[key]
+    try:
+      sessionData = doParseJWT(jwt, salt)
+    except:
+      raise Unauthorized("Invalid session")
+  if sessionData['idStudent'] is None:
+    raise BadRequest('Not allow to create project')
+
+  try:
+    __db.session().add(instance)
+    __db.session().commit()
+  except Exception as e:
+    raise e
+
+  projectStudentRelInst = Projectstudentrel({
+    'idStudent': sessionData['idStudent'],
+    'idProject': instance.idProject,
+    'status': 1
+  })
+
+  try:
+    __db.session().add(projectStudentRelInst)
+    __db.session().commit()
+  except Exception as e:
+    raise BadRequest(e)
+
   return instance
 
 def __doGet(id):
@@ -89,9 +124,12 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  results = __db.session().query(Project).filter_by(**model).all()
-  return results
+  if 'title' in model:
+    results = __db.session().query(Project).filter(Project.title.ilike(f'%{model["title"]}%')).all()
+  else:
+    results = __db.session().query(Project).filter_by(**model).all()
 
+  return results
 
 def listProjects():
   doLog("list DAO function")

@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
@@ -6,6 +7,8 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
+from ..guestadvisors import Guestadvisor
+from ..advisors import Advisor
 
 __db = DbInstance.getInstance()
 
@@ -41,7 +44,37 @@ def __doList():
   return []
   
 def __doNew(instance):
-  return {}
+  guestAdvisor = __db.session().query(Guestadvisor).filter(Guestadvisor.email == instance.email).first()
+  hashPw = doHash(instance.password)
+  if guestAdvisor is None:
+    raise BadRequest("Guest advisor not found")
+  elif hashPw != guestAdvisor.password:
+    raise BadRequest('Incorrect password')
+  else:
+    advisor = __db.session().query(Advisor).filter(Advisor.idGuestadvisor == guestAdvisor.idGuestadvisor).first()
+    if advisor is None:
+      advisor = Advisor({
+        'email': instance.email,
+        'fullname': guestAdvisor.fullname,
+        'idGuestadvisor': guestAdvisor.idGuestadvisor
+      })
+      __db.session().add(advisor)
+      __db.session().commit()
+
+    key = doHash(str(instance.email))
+    salt = os.urandom(20)
+    session[key] = salt
+    doLog(advisor.json())
+    jwt = doGenJWT(advisor.json(), salt)
+    @after_this_request
+    def finalize(response):
+      response.set_cookie('key', key)
+      response.set_cookie('jwt', jwt)
+      response.headers['x-key'] = key
+      response.headers['x-jwt'] = jwt
+      return response
+
+    return advisor
 
 def __doUpdate(id, model):
   return {}

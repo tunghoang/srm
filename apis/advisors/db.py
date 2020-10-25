@@ -84,7 +84,12 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  results = __db.session().query(Advisor).filter_by(**model).all()
+  if 'email' in model:
+    results = __db.session().query(Advisor).filter(Advisor.email.ilike(f"%{model['email']}%")).all()
+  elif 'fullname' in model:
+    results = __db.session().query(Advisor).filter(Advisor.fullname.ilike(f"%{model['fullname']}%")).all()
+  else:
+    results = __db.session().query(Advisor).filter_by(**model).all()
   return results
 
 

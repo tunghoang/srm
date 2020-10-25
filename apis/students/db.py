@@ -89,7 +89,12 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  results = __db.session().query(Student).filter_by(**model).all()
+  if 'email' in model:
+    results = __db.session().query(Student).filter(Student.email.ilike(f"%{model['email']}%")).all()
+  elif 'fullname' in model:
+    results = __db.session().query(Student).filter(Student.fullname.ilike(f"%{model['fullname']}%")).all()
+  else:
+    results = __db.session().query(Student).filter_by(**model).all()
   return results
 
 
@@ -166,3 +171,5 @@ def findStudent(model):
   except SQLAlchemyError as e:
     __db.session().rollback()
     raise e
+  except Exception as e:
+    raise BadRequest(f"Error: {e}")
