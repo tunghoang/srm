@@ -13,7 +13,7 @@ __db = DbInstance.getInstance()
 
 class Projectstudentrel(__db.Base):
   __tablename__ = "projectStudentRel"
-  idProjectStudentRel = Column(Integer, primary_key = True)
+  idProjectstudentrel = Column(Integer, primary_key = True)
   idStudent = Column(Integer, ForeignKey('student.idStudent'))
   idProject = Column(Integer, ForeignKey('project.idProject'))
   status = Column(Integer)
@@ -23,8 +23,8 @@ class Projectstudentrel(__db.Base):
     __table_args__ = tuple(constraints)
  
   def __init__(self, dictModel):
-    if ("idProjectStudentRel" in dictModel) and (dictModel["idProjectStudentRel"] != None):
-      self.idProjectStudentRel = dictModel["idProjectStudentRel"]
+    if ("idProjectstudentrel" in dictModel) and (dictModel["idProjectstudentrel"] != None):
+      self.idProjectstudentrel = dictModel["idProjectstudentrel"]
     if ("idStudent" in dictModel) and (dictModel["idStudent"] != None):
       self.idStudent = dictModel["idStudent"]
     if ("idProject" in dictModel) and (dictModel["idProject"] != None):
@@ -33,16 +33,16 @@ class Projectstudentrel(__db.Base):
       self.status = dictModel["status"]
 
   def __repr__(self):
-    return '<Projectstudentrel idProjectStudentRel={} idStudent={} idProject={} status={} >'.format(self.idProjectStudentRel, self.idStudent, self.idProject, self.status, )
+    return '<Projectstudentrel idProjectstudentrel={} idStudent={} idProject={} status={} >'.format(self.idProjectstudentrel, self.idStudent, self.idProject, self.status, )
 
   def json(self):
     return {
-      "idProjectStudentRel":self.idProjectStudentRel,"idStudent":self.idStudent,"idProject":self.idProject,"status":self.status,
+      "idProjectstudentrel":self.idProjectstudentrel,"idStudent":self.idStudent,"idProject":self.idProject,"status":self.status,
     }
 
   def update(self, dictModel):
-    if ("idProjectStudentRel" in dictModel) and (dictModel["idProjectStudentRel"] != None):
-      self.idProjectStudentRel = dictModel["idProjectStudentRel"]
+    if ("idProjectstudentrel" in dictModel) and (dictModel["idProjectstudentrel"] != None):
+      self.idProjectstudentrel = dictModel["idProjectstudentrel"]
     if ("idStudent" in dictModel) and (dictModel["idStudent"] != None):
       self.idStudent = dictModel["idStudent"]
     if ("idProject" in dictModel) and (dictModel["idProject"] != None):

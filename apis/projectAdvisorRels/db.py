@@ -13,7 +13,7 @@ __db = DbInstance.getInstance()
 
 class Projectadvisorrel(__db.Base):
   __tablename__ = "projectAdvisorRel"
-  idProjectAdvisorRel = Column(Integer, primary_key = True)
+  idProjectadvisorrel = Column(Integer, primary_key = True)
   idAdvisor = Column(Integer, ForeignKey('advisor.idAdvisor'))
   idProject = Column(Integer, ForeignKey('project.idProject'))
   status = Column(Integer)
@@ -23,8 +23,8 @@ class Projectadvisorrel(__db.Base):
     __table_args__ = tuple(constraints)
  
   def __init__(self, dictModel):
-    if ("idProjectAdvisorRel" in dictModel) and (dictModel["idProjectAdvisorRel"] != None):
-      self.idProjectAdvisorRel = dictModel["idProjectAdvisorRel"]
+    if ("idProjectadvisorrel" in dictModel) and (dictModel["idProjectadvisorrel"] != None):
+      self.idProjectadvisorrel = dictModel["idProjectadvisorrel"]
     if ("idAdvisor" in dictModel) and (dictModel["idAdvisor"] != None):
       self.idAdvisor = dictModel["idAdvisor"]
     if ("idProject" in dictModel) and (dictModel["idProject"] != None):
@@ -33,16 +33,16 @@ class Projectadvisorrel(__db.Base):
       self.status = dictModel["status"]
 
   def __repr__(self):
-    return '<Projectadvisorrel idProjectAdvisorRel={} idAdvisor={} idProject={} status={} >'.format(self.idProjectAdvisorRel, self.idAdvisor, self.idProject, self.status, )
+    return '<Projectadvisorrel idProjectadvisorrel={} idAdvisor={} idProject={} status={} >'.format(self.idProjectadvisorrel, self.idAdvisor, self.idProject, self.status, )
 
   def json(self):
     return {
-      "idProjectAdvisorRel":self.idProjectAdvisorRel,"idAdvisor":self.idAdvisor,"idProject":self.idProject,"status":self.status,
+      "idProjectadvisorrel":self.idProjectadvisorrel,"idAdvisor":self.idAdvisor,"idProject":self.idProject,"status":self.status,
     }
 
   def update(self, dictModel):
-    if ("idProjectAdvisorRel" in dictModel) and (dictModel["idProjectAdvisorRel"] != None):
-      self.idProjectAdvisorRel = dictModel["idProjectAdvisorRel"]
+    if ("idProjectadvisorrel" in dictModel) and (dictModel["idProjectadvisorrel"] != None):
+      self.idProjectadvisorrel = dictModel["idProjectadvisorrel"]
     if ("idAdvisor" in dictModel) and (dictModel["idAdvisor"] != None):
       self.idAdvisor = dictModel["idAdvisor"]
     if ("idProject" in dictModel) and (dictModel["idProject"] != None):

@@ -2,7 +2,7 @@ from flask_restplus.fields import Integer, Float, String, String as Text, Date, 
 
 def create_model(api):
   model = api.model('projectAdvisorRel', {
-    'idProjectAdvisorRel': Integer,
+    'idProjectadvisorrel': Integer,
     'idAdvisor': Integer,
     'idProject': Integer,
     'status': Integer 

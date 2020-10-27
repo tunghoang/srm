@@ -251,7 +251,7 @@ namespaces:
     ns_description: project-Student Relationship
     resource_name: projectStudentRel
     props:
-      - name: idProjectStudentRel
+      - name: idProjectstudentrel
         type: Integer
         primary_key: yes
       - name: idStudent
@@ -276,7 +276,7 @@ namespaces:
     ns_description: project-Advisor Relationship
     resource_name: projectAdvisorRel
     props:
-      - name: idProjectAdvisorRel
+      - name: idProjectadvisorrel
         type: Integer
         primary_key: yes
       - name: idAdvisor
