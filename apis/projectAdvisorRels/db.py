@@ -7,6 +7,8 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+from ..advisors import Advisor
+
 __db = DbInstance.getInstance()
 
 
@@ -78,10 +80,18 @@ def __doDelete(id):
   __db.session().delete(instance)
   __db.session().commit()
   return instance
-def __doFind(model):
-  results = __db.session().query(Projectadvisorrel).filter_by(**model).all()
-  return results
 
+def __doFind(model):
+  queryObj = __db.session().query(Advisor.fullname, Projectadvisorrel.idAdvisor, Projectadvisorrel.idProject, Projectadvisorrel.idProjectadvisorrel).filter(Advisor.idAdvisor == Projectadvisorrel.idAdvisor)
+  if 'idProject' in model:
+    queryObj = queryObj.filter(Projectadvisorrel.idProject == model['idProject'])
+  if 'idAdvisor' in model:
+    queryObj = queryObj.filter(Projectadvisorrel.idAdvisor == model['idAdvisor'])
+  if 'status' in model:
+    queryObj = queryObj.filter(Projectadvisorrel.status == model['status'])
+
+  results = queryObj.all()
+  return list(map(lambda x: {'fullname': x[0], 'idAdvisor': x[1], 'idProject': x[2], 'idProjectadvisorrel': x[3]}, results))
 
 def listProjectadvisorrels():
   doLog("list DAO function")

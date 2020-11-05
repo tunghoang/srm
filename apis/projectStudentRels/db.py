@@ -7,6 +7,7 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+from ..students import Student
 __db = DbInstance.getInstance()
 
 
@@ -79,8 +80,17 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  results = __db.session().query(Projectstudentrel).filter_by(**model).all()
-  return results
+  queryObj = __db.session().query(Student.fullname, Student.studentNumber, Projectstudentrel.idStudent, Projectstudentrel.idProject, Projectstudentrel.idProjectstudentrel).filter(Student.idStudent == Projectstudentrel.idStudent)
+  if 'idProject' in model:
+    queryObj = queryObj.filter(Projectstudentrel.idProject == model['idProject'])
+  if 'idStudent' in model:
+    queryObj = queryObj.filter(Projectstudentrel.idStudent == model['idStudent'])
+  if 'status' in model:
+    queryObj = queryObj.filter(Projectstudentrel.status == model['status'])
+
+  results = queryObj.all()
+
+  return list(map(lambda x:{'fullname':x[0], 'studentNumber':x[1], 'idStudent':x[2], 'idProject':x[3], 'idProjectstudentrel': x[4]}, results))
 
 
 def listProjectstudentrels():

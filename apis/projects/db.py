@@ -8,6 +8,11 @@ from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
 from ..projectStudentRels import Projectstudentrel
+from ..projectAdvisorRels import Projectadvisorrel
+from ..students import Student
+from ..advisors import Advisor
+from ..semesters import Semester
+from ..projecttypes import Projecttype
 
 __db = DbInstance.getInstance()
 
@@ -124,12 +129,74 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  if 'title' in model:
-    results = __db.session().query(Project).filter(Project.title.ilike(f'%{model["title"]}%')).all()
+  if 'idAdvisor' in model:
+    queryObj = __db.session().query(
+      Project.idProject, 
+      Project.title, 
+      Project.status, 
+      Project.grade, 
+      Project.idSemester,
+      Project.idProjecttype,
+      Semester.year, Semester.semesterIndex,
+      Projecttype.name,
+      Projectadvisorrel.idProjectadvisorrel,
+      Projectadvisorrel.idAdvisor,
+      Projectadvisorrel.status,
+      Advisor.fullname
+    ).filter(
+      Project.idSemester == Semester.idSemester,
+      Project.idProjecttype == Projecttype.idProjecttype,
+      Project.idProject == Projectadvisorrel.idProject,
+      Projectadvisorrel.idAdvisor == Advisor.idAdvisor
+    )
+    queryObj = queryObj.filter(Projectadvisorrel.idAdvisor == model['idAdvisor'])
+  elif 'idStudent' in model:
+    queryObj = __db.session().query(
+      Project.idProject, 
+      Project.title, 
+      Project.status, 
+      Project.grade, 
+      Project.idSemester,
+      Project.idProjecttype,
+      Semester.year, Semester.semesterIndex,
+      Projecttype.name,
+      Projectstudentrel.idProjectstudentrel,
+      Projectstudentrel.idStudent,
+      Projectstudentrel.status,
+      Student.fullname, Student.studentNumber
+    ).filter(
+      Project.idSemester == Semester.idSemester,
+      Project.idProjecttype == Projecttype.idProjecttype,
+      Project.idProject == Projectstudentrel.idProject,
+      Projectstudentrel.idStudent == Student.idStudent
+    )
+    queryObj = queryObj.filter(Projectstudentrel.idStudent == model['idStudent'])
   else:
-    results = __db.session().query(Project).filter_by(**model).all()
+    queryObj = __db.session().query(
+      Project.idProject, 
+      Project.title, 
+      Project.status, 
+      Project.grade, 
+      Project.idSemester,
+      Project.idProjecttype,
+      Semester.year, Semester.semesterIndex,
+      Projecttype.name
+    ).filter(
+      Project.idSemester == Semester.idSemester,
+      Project.idProjecttype == Projecttype.idProjecttype
+    )
 
-  return results
+  if 'title' in model:
+    queryObj = queryObj.filter(Project.title.ilike(f'%{model["title"]}%'))
+  if 'status' in model:
+    queryObj = queryObj.filter(Project.status == model['status'])
+
+  results = queryObj.all()
+
+  return list(map(lambda x: {
+    'idProject': x[0], 'title': x[1], 'status': x[2], 'grade': x[3], 'idSemester': x[4], 'idProjecttype': x[5], 'year': x[6],
+    'semesterIndex': x[7], 'projecttypeName': x[8] 
+  }, results))
 
 def listProjects():
   doLog("list DAO function")

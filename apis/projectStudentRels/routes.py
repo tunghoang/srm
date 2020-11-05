@@ -11,7 +11,7 @@ def init_routes(api, model):
       return listProjectstudentrels()
     @api.doc('find projectstudent rels')
     @api.expect(model)
-    @api.marshal_list_with(model)
+    #@api.marshal_list_with(model)
     def put(self):
       '''find projectstudent rels'''
       return findProjectstudentrel(api.payload)
