@@ -23,6 +23,8 @@ from .projectStudentRels import create_api as create_projectStudentRels
 api.add_namespace(create_projectStudentRels())
 from .projectAdvisorRels import create_api as create_projectAdvisorRels
 api.add_namespace(create_projectAdvisorRels())
+from .studentSemesterRels import create_api as create_studentSemesterRels
+api.add_namespace(create_studentSemesterRels())
 from .stafflogin import create_api as create_stafflogin
 api.add_namespace(create_stafflogin())
 from .advisorlogin import create_api as create_advisorlogin
