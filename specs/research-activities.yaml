@@ -297,6 +297,31 @@ namespaces:
     delete_api_description: delete project advisor rel
     find_api: find projectadvisor rels
     find_api_description: find projectadvisor rels
+  - ns_name: studentSemesterRels
+    ns_description: student semester relationship
+    resource_name: studentSemesterRel
+    props:
+      - name: idStudentsemesterrel
+        type: Integer
+        primary_key: yes
+      - name: idSemester
+        type: Integer
+        foreign_key: semester.idSemester
+      - name: idStudent
+        type: Integer
+        foreign_key: student.idStudent
+      - name: removed
+        type: Integer
+    list_api: list student semester relationships
+    list_api_description: list student semester relationships
+    new_api: create student semester relationship
+    new_api_description: create student semester relationship
+    update_api: update student semester relationship
+    update_api_description: update student semester relationship
+    delete_api: delete student semester relationship
+    delete_api_description: delete student semester relationship
+    find_api: find student semester rels
+    find_api_description: find student semester rels
   - ns_name: stafflogin
     ns_description: login for staff
     resource_name: stafflogin
