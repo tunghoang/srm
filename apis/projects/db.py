@@ -190,6 +190,10 @@ def __doFind(model):
     queryObj = queryObj.filter(Project.title.ilike(f'%{model["title"]}%'))
   if 'status' in model:
     queryObj = queryObj.filter(Project.status == model['status'])
+  if 'idSemester' in model:
+    queryObj = queryObj.filter(Project.idSemester == model['idSemester'])
+  if 'idProjecttype' in model:
+    queryObj = queryObj.filter(Project.idProjecttype == model['idProjecttype'])
 
   results = queryObj.all()
 
