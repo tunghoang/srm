@@ -23,6 +23,28 @@ def _getLDAPConnection():
 
   return _ldapConnection
 
+def doList(base):
+  print("*********")
+  global _ldapConnectionRetries
+  global _ldapConnection
+  conn = None
+  try:
+    conn = _getLDAPConnection()
+  except Exception as e:
+    _ldapConnectionRetries -= 1
+    if _ldapConnectionRetries == 0:
+      raise Exception("Cannot connect to LDAP server: " + e)
+    else:
+      _ldapConnection = None
+      return list(base)
+  try:
+    result = conn.search_s(base, ldap.SCOPE_SUBTREE, 'objectClass=account')
+  except Exception as e:
+    print(e)
+    _ldapConnection = None
+    return list(base)
+  return result
+
 def search(base, uid):
   print(base, uid)
   global _ldapConnectionRetries
@@ -33,10 +55,10 @@ def search(base, uid):
   except Exception as e:
     _ldapConnectionRetries -= 1
     if _ldapConnectionRetries == 0:
-      raise Exception("Cannot connecto to LDAP server: " + e)
+      raise Exception("Cannot connect to LDAP server: " + e)
     else:
       _ldapConnection = None
-      search(base,uid)
+      return search(base,uid)
   try:
     result = conn.search_s(base, ldap.SCOPE_SUBTREE, f'uid={uid}')
   except Exception as e:

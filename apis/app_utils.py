@@ -2,6 +2,10 @@ from hashlib import sha256
 from flask import jsonify
 from jwt import encode, decode
 from werkzeug.exceptions import *
+
+from pandas import read_excel
+
+from .db_utils import config
 SALT = 'fitresact'
 def doHash(str):
   str1 = SALT + str
@@ -53,3 +57,13 @@ def buildAdvisorRecordFromLDAPAttrs(attrs):
     'idGuestadvisor': None
   }
 
+def processStudentListUpload(path, callbackFn):
+  data = read_excel(
+    path, 
+    sheet_name=config.get('Excel', 'sheet_name', fallback=2), 
+    skiprows=int(config.get('Excel', 'skiprows', fallback=3))
+  )
+  values = data._values
+  for row in values:
+    rowObj = { 'studentNumber': int(row[1]), "allow": True if row[7] == 'ok' else False }
+    callbackFn(rowObj)

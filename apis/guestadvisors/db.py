@@ -63,7 +63,9 @@ def __doList():
   return __db.session().query(Guestadvisor).all()
   
 def __doNew(instance):
-  instance.password = doHash(instance.password)
+  doLog('__doNew____' + str(instance))
+  email = instance.email
+  fullname = instance.fullname
   try:
     __db.session().add(instance)
     __db.session().commit()
@@ -71,8 +73,8 @@ def __doNew(instance):
     raise e
 
   advisor = Advisor({
-    'email': instance.email,
-    'fullname': instance.fullname,
+    'email': email,
+    'fullname': fullname,
     'idGuestadvisor': instance.idGuestadvisor
   })
 
@@ -120,6 +122,7 @@ def listGuestadvisors():
 
 def newGuestadvisor(model):
   doLog("new DAO function. model: {}".format(model))
+  model['password'] = doHash(model['password'])
   instance = Guestadvisor(model)
   res = False
   try:
