@@ -101,6 +101,10 @@ def listProjects():
     doLog(e)
     __recover()
     return __doList()
+  except InterfaceError as e:
+    doLog(e)
+    __recover()
+    return __doList()
   except SQLAlchemyError as e:
     __db.session().rollback()
     raise e
@@ -124,6 +128,10 @@ def getProject(id):
   try:
     return __doGet(id)
   except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doGet(id)
+  except InterfaceError as e:
     doLog(e)
     __recover()
     return __doGet(id)
