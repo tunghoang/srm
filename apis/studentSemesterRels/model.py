@@ -5,6 +5,7 @@ def create_model(api):
     'idStudentsemesterrel': Integer,
     'idSemester': Integer,
     'idStudent': Integer,
-    'removed': Integer 
+    'removed': Integer,
+    'email': String
   },mask='*');
   return model

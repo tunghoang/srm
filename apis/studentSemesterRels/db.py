@@ -4,6 +4,9 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
 from ..app_utils import *
+from ..semesters import Semester
+from ..projects import Project
+from ..students import Student
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
