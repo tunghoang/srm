@@ -19,7 +19,7 @@ class Student(__db.Base):
   fullname = Column(String(150))
   dob = Column(Date)
   gender = Column(Boolean)
-  klass = Column(String)
+  klass = Column(String(20))
 
   constraints = list()
   if len(constraints) > 0:
