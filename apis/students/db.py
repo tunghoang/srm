@@ -19,7 +19,7 @@ class Student(__db.Base):
   fullname = Column(String(150))
   dob = Column(Date)
   gender = Column(Boolean)
-  class = Column(String)
+  klass = Column(String)
 
   constraints = list()
   if len(constraints) > 0:
@@ -38,15 +38,15 @@ class Student(__db.Base):
       self.dob = dictModel["dob"]
     if ("gender" in dictModel) and (dictModel["gender"] != None):
       self.gender = dictModel["gender"]
-    if ("class" in dictModel) and (dictModel["class"] != None):
-      self.class = dictModel["class"]
+    if ("klass" in dictModel) and (dictModel["klass"] != None):
+      self.klass = dictModel["klass"]
 
   def __repr__(self):
-    return '<Student idStudent={} studentNumber={} email={} fullname={} dob={} gender={} class={} >'.format(self.idStudent, self.studentNumber, self.email, self.fullname, self.dob, self.gender, self.class, )
+    return '<Student idStudent={} studentNumber={} email={} fullname={} dob={} gender={} klass={} >'.format(self.idStudent, self.studentNumber, self.email, self.fullname, self.dob, self.gender, self.klass, )
 
   def json(self):
     return {
-      "idStudent":self.idStudent,"studentNumber":self.studentNumber,"email":self.email,"fullname":self.fullname,"dob":self.dob,"gender":self.gender,"class":self.class,
+      "idStudent":self.idStudent,"studentNumber":self.studentNumber,"email":self.email,"fullname":self.fullname,"dob":self.dob,"gender":self.gender,"klass":self.klass,
     }
 
   def update(self, dictModel):
@@ -62,8 +62,8 @@ class Student(__db.Base):
       self.dob = dictModel["dob"]
     if ("gender" in dictModel) and (dictModel["gender"] != None):
       self.gender = dictModel["gender"]
-    if ("class" in dictModel) and (dictModel["class"] != None):
-      self.class = dictModel["class"]
+    if ("klass" in dictModel) and (dictModel["klass"] != None):
+      self.klass = dictModel["klass"]
 
 def __recover():
   __db.newSession()
