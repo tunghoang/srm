@@ -23,25 +23,94 @@ def importAdvisorsFromLDAP():
   __db.session().commit()
 
 from pandas import read_excel, DataFrame
+from apis.students.db import newStudent,findStudent
+from apis.projects import Project
+from apis.semesters.db import findSemester
+from apis.projectStudentRels.db import newProjectstudentrel
+from apis.projectAdvisorRels.db import newProjectadvisorrel
+from apis.studentSemesterRels.db import newStudentsemesterrel
 import math
+from datetime import datetime
 def seedProjectsFromExcel(path, year, semesterIndex):
+  __db = DbInstance.getInstance()
+  f1 = open('log1.txt', 'w+')
+  f2 = open('log2.txt', 'w+')
+  semesters = findSemester({'year': year, 'semesterIndex': semesterIndex})
+  if len(semesters) == 0: 
+    return;
+  idSemester = semesters[0].idSemester
+  print(idSemester)
+
   data = read_excel(path, sheet_name='Data', skiprows=1)
   values = data._values
   for row in values:
     try:
-      rowObj = { 
+      studentObj = {
         'studentNumber' : int(row[1]),
         'fullname': row[2].strip(),
         'email': f'{int(row[1])}@vnu.edu.vn',
-        'dob': row[3],
-        'title': row[5],
-        'idAdvisor': int(row[9]) if not math.isnan(row[9]) else None,
-        'idAdvisor1': int(row[10]) if not math.isnan(row[10]) else None
+        'dob': datetime.strptime(row[3].strip(), "%d/%m/%Y").date(),
+        'klass': row[4]
       }
-    except:
-      print(row)
-    print(rowObj)
+      idStudent = None
+      results = findStudent({'studentNumber': int(row[1])})
 
+      if len(results) == 0:
+        student = newStudent(studentObj)
+        idStudent = student.idStudent
+      else:
+        idStudent = results[0].idStudent
+      projectObj = {
+        'title': row[5],
+        'idProjecttype': 17,
+        'idSemester': idSemester,
+        'status': 'on-going'
+      }
+      project = Project(projectObj)
+      __db.session().add(project)
+      __db.session().commit()
+      #project = newProject(projectObj)
+      f1.write(str(project.idProject) + " - " + str(idStudent) + "\n")
+      idProject = project.idProject
+
+      projectStudentRelObj = {
+        'idStudent': idStudent,
+        'idProject': idProject,
+        'status': 1
+      }
+      newProjectstudentrel(projectStudentRelObj)
+
+      idAdvisor = int(row[9]) if not math.isnan(row[9]) else None
+      idAdvisor1 = int(row[10]) if not math.isnan(row[10]) else None
+      if idAdvisor is not None:
+        newProjectadvisorrel({'idAdvisor':idAdvisor, 'idProject': idProject, 'status': 1})
+      if idAdvisor1 is not None:
+        newProjectadvisorrel({'idAdvisor':idAdvisor1, 'idProject': idProject, 'status': 1})
+      
+      newStudentsemesterrel({
+        'idStudent': idStudent,
+        'idSemester': idSemester
+      })
+
+      #rowObj = { 
+      #  'studentNumber' : int(row[1]),
+      #  'fullname': row[2].strip(),
+      #  'email': f'{int(row[1])}@vnu.edu.vn',
+      #  'dob': row[3],
+      #  'klass': row[4],
+      #  'title': row[5],
+      #  'idAdvisor': int(row[9]) if not math.isnan(row[9]) else None,
+      #  'idAdvisor1': int(row[10]) if not math.isnan(row[10]) else None
+      #}
+    except Exception as e:
+      f2.write(str(e))
+      f2.write("\n")
+      print(row)
+      f2.write("\n")
+      f2.write("\n")
+    #print(rowObj)
+  f1.close()
+  f2.close()
 
 #importAdvisorsFromLDAP()
-seedProjectsFromExcel('fit2016.xlsx', 2021, 0)
+seedProjectsFromExcel('fit2016.xlsx', 2020, 1)

@@ -112,7 +112,6 @@ def __doFind(model):
   doLog(params)
 
   results = __db.session().execute(queryStr, params).fetchall()
-  print(results)
   return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'student_studentNumber': x[3], 'student_fullname': x[4], 'semester_year': x[5], 'semester_semesterIndex': x[6], 'idStudentSemesterRel': x[7]}, results))
 
 
