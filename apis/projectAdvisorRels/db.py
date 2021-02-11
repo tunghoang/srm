@@ -82,7 +82,13 @@ def __doDelete(id):
   return instance
 
 def __doFind(model):
-  queryObj = __db.session().query(Advisor.fullname, Projectadvisorrel.idAdvisor, Projectadvisorrel.idProject, Projectadvisorrel.idProjectadvisorrel).filter(Advisor.idAdvisor == Projectadvisorrel.idAdvisor)
+  queryObj = __db.session().query(
+    Advisor.fullname, 
+    Projectadvisorrel.idAdvisor, 
+    Projectadvisorrel.idProject, 
+    Projectadvisorrel.idProjectadvisorrel,
+    Projectadvisorrel.status
+  ).filter(Advisor.idAdvisor == Projectadvisorrel.idAdvisor)
   if 'idProject' in model:
     queryObj = queryObj.filter(Projectadvisorrel.idProject == model['idProject'])
   if 'idAdvisor' in model:
@@ -91,7 +97,7 @@ def __doFind(model):
     queryObj = queryObj.filter(Projectadvisorrel.status == model['status'])
 
   results = queryObj.all()
-  return list(map(lambda x: {'fullname': x[0], 'idAdvisor': x[1], 'idProject': x[2], 'idProjectadvisorrel': x[3]}, results))
+  return list(map(lambda x: {'fullname': x[0], 'idAdvisor': x[1], 'idProject': x[2], 'idProjectadvisorrel': x[3], 'status': x[4]}, results))
 
 def listProjectadvisorrels():
   doLog("list DAO function")

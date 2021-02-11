@@ -9,7 +9,7 @@ import os
 
 db = DbInstance.getInstance()
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/public', static_folder='public')
 #app.wsgi_app = ProxyFix(app.wsgi_app)
 app.config['DEBUG'] = False
 app.config['JSON_AS_ASCII'] = False
@@ -24,6 +24,7 @@ Session(app)
 
 @app.before_request
 def before_request():
+  print("Request: " + request.path)
   key = request.cookies.get('key')
   jwt = request.cookies.get('jwt')
   key = key if key is not None else request.headers.get('auth-key')
@@ -32,6 +33,8 @@ def before_request():
   #no_auth_prefixes = ( '/swaggerui', '/')
   no_auth_prefixes = ( '/swaggerui', '/studentlogin', '/stafflogin', '/advisorlogin', '/guestlogin', '/upload' )
 
+  print(key)
+  print(jwt)
   if request.path in no_auth_routes or matchOneOf(request.path, no_auth_prefixes) :
     return None
   elif jwt is None or key is None:
@@ -45,6 +48,7 @@ def before_request():
   else:
     raise Unauthorized("Not login")
 
+  print("Ok")
   return None
 
 @app.after_request

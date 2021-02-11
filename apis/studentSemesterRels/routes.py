@@ -10,8 +10,8 @@ def init_routes(api, model):
       '''list student semester relationships'''
       return listStudentsemesterrels()
     @api.doc('find student semester rels')
-    @api.expect(model)
-    @api.marshal_list_with(model)
+    #@api.expect(model)
+    #@api.marshal_list_with(model)
     def put(self):
       '''find student semester rels'''
       return findStudentsemesterrel(api.payload)

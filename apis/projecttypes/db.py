@@ -89,6 +89,7 @@ def listProjecttypes():
   except InterfaceError as e:
     doLog(e)
     __recover()
+    doLog('======== InterfaceError ')
     return __doList()
   except SQLAlchemyError as e:
     __db.session().rollback()

@@ -67,9 +67,25 @@ def __doNew(instance):
   return instance
 
 def __doGet(id):
-  instance = __db.session().query(Advisor).filter(Advisor.idAdvisor == id).scalar()
-  doLog("__doGet: {}".format(instance))
-  return instance
+  queryStr = """
+    SELECT a.idAdvisor, a.fullname, a.email, a.idGuestadvisor, g.affiliation
+    FROM advisor a 
+      LEFT JOIN guestadvisor g 
+        ON a.idGuestadvisor = g.idGuestadvisor
+    WHERE a.idAdvisor = :idAdvisor
+  """
+  params = {'idAdvisor': id}
+  result = __db.session().execute(queryStr, params).fetchone()
+  return {
+    'idAdvisor': result[0], 
+    'fullname': result[1],
+    'email': result[2],
+    'idGuestadvisor': result[3],
+    'affiliation': result[4]
+  }
+  #instance = __db.session().query(Advisor).filter(Advisor.idAdvisor == id).scalar()
+  #doLog("__doGet: {}".format(instance))
+  #return instance
 
 def __doUpdate(id, model):
   instance = getAdvisor(id)
@@ -171,6 +187,34 @@ def findAdvisor(model):
     doLog(e)
     __recover()
     return __doFind(model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
+
+def __doDump():
+  queryStr = """
+    SELECT a.idAdvisor, a.fullname, a.email, a.idGuestadvisor, g.affiliation
+    FROM advisor a 
+      LEFT JOIN guestadvisor g 
+        ON a.idGuestadvisor = g.idGuestadvisor
+  """
+  results = __db.session().execute(queryStr).fetchall()
+  return list(map(lambda result: {
+    'idAdvisor': result[0], 
+    'fullname': result[1],
+    'email': result[2],
+    'idGuestadvisor': result[3],
+    'affiliation': result[4]
+  }, results))
+  
+def dumpAdvisors():
+  doLog('dump Advisor')
+  try:
+    return __doDump()
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doDump(model)
   except SQLAlchemyError as e:
     __db.session().rollback()
     raise e

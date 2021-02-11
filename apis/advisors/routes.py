@@ -24,6 +24,10 @@ def init_routes(api, model):
 
   @api.route('/<int:id>')
   class Instance(Resource):
+    @api.doc('get advisor')
+    def get(self, id):
+      '''get advisor'''
+      return getAdvisor(id)
     @api.doc('edit advisor', body=model)
     @api.expect(model)
     @api.marshal_with(model)

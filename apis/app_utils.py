@@ -3,7 +3,7 @@ from flask import jsonify
 from jwt import encode, decode
 from werkzeug.exceptions import *
 
-from pandas import read_excel
+from pandas import read_excel, DataFrame
 
 from .db_utils import config
 SALT = 'fitresact'
@@ -67,3 +67,6 @@ def processStudentListUpload(path, callbackFn):
   for row in values:
     rowObj = { 'studentNumber': int(row[1]), "allow": True if row[7] == 'ok' else False }
     callbackFn(rowObj)
+
+def toDataFrame(objList):
+  return DataFrame.from_records(objList)

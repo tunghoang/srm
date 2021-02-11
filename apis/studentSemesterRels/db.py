@@ -7,6 +7,8 @@ from ..app_utils import *
 from ..semesters import Semester
 from ..projects import Project
 from ..students import Student
+from ..projectStudentRels import Projectstudentrel
+from ..projecttypes import Projecttype
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
@@ -82,8 +84,36 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  results = __db.session().query(Studentsemesterrel).filter_by(**model).all()
-  return results
+  whereClause = "WHERE sem.idSemester = :idSemester"
+  params = {'idSemester': model['idSemester']}
+  if model.get('email', None) != None:
+    whereClause += " AND stu.email like :email_pattern"
+    params['email_pattern'] = f'%{model["email"]}%'
+  if model.get('fullname', None) != None:
+    whereClause += " AND stu.fullname like :fullname_pattern"
+    params['fullname_pattern'] = f'%{model["fullname"]}%'
+
+  queryStr = """
+    SELECT prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel
+    FROM projecttype as pt
+      RIGHT JOIN project as prj
+        ON prj.idProjecttype = pt.idProjecttype
+      RIGHT JOIN projectStudentRel as prjStu 
+        ON prj.idProject = prjStu.idProject
+      LEFT JOIN student as stu
+        on prjStu.idStudent = stu.idStudent
+      RIGHT JOIN studentSemesterRel as stuSem
+        ON stu.idStudent = stuSem.idStudent
+      LEFT JOIN semester as sem 
+        ON stuSem.idSemester = sem.idSemester
+  """
+  queryStr += whereClause
+  doLog(queryStr)
+  doLog(params)
+
+  results = __db.session().execute(queryStr, params).fetchall()
+  print(results)
+  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'student_studentNumber': x[3], 'student_fullname': x[4], 'semester_year': x[5], 'semester_semesterIndex': x[6], 'idStudentSemesterRel': x[7]}, results))
 
 
 def listStudentsemesterrels():

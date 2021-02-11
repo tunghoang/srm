@@ -197,6 +197,12 @@ def __doFind(model):
 
   results = queryObj.all()
 
+  if 'idAdvisor' in model:
+    return list(map(lambda x: {
+      'idProject': x[0], 'title': x[1], 'status': x[2], 'grade': x[3], 'idSemester': x[4], 'idProjecttype': x[5], 'year': x[6],
+      'semesterIndex': x[7], 'projecttypeName': x[8], 'confirmed': x[11]
+    }, results))
+
   return list(map(lambda x: {
     'idProject': x[0], 'title': x[1], 'status': x[2], 'grade': x[3], 'idSemester': x[4], 'idProjecttype': x[5], 'year': x[6],
     'semesterIndex': x[7], 'projecttypeName': x[8] 
