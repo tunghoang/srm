@@ -132,6 +132,8 @@ namespaces:
         type: Date
       - name: gender
         type: Boolean
+      - name: class
+        type: String
     list_api: list students
     list_api_description: list students
     new_api: create student

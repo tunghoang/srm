@@ -7,6 +7,7 @@ def create_model(api):
     'email': String,
     'fullname': String,
     'dob': Date,
-    'gender': Boolean 
+    'gender': Boolean,
+    'class': String 
   },mask='*');
   return model
