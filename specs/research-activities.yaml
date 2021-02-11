@@ -133,7 +133,7 @@ namespaces:
       - name: gender
         type: Boolean
       - name: klass
-        type: String
+        type: String(20)
     list_api: list students
     list_api_description: list students
     new_api: create student

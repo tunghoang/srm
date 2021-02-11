@@ -8,6 +8,6 @@ def create_model(api):
     'fullname': String,
     'dob': Date,
     'gender': Boolean,
-    'klass': String 
+    'klass': String(20) 
   },mask='*');
   return model
