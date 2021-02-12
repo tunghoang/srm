@@ -20,3 +20,15 @@ class XlsxExportAdvisors(Resource):
     print(df)
     df.to_excel('public/advisors.xlsx', index=False, engine='xlsxwriter')
     return send_from_directory('public', 'advisors.xlsx')
+
+from .studentSemesterRels.db import findStudentsemesterrel
+exportStudentSemesterApi = Namespace('exportStudentSemester', 'export all student in semester')
+@exportStudentSemesterApi.route('/<int:id>')
+class XlsxExportStudentSemester(Resource):
+  @exportStudentSemesterApi.doc("Export all students going to graduate in a semester")
+  def get(self, id):
+    doLog("Export students in a semester " + str(id))
+    results = findStudentsemesterrel({'idSemester':id})
+    df = toDataFrame(results)
+    df.to_excel('public/studentSemester.xlsx', index=False, engine='xlsxwriter')
+    return send_from_directory('public', 'studentSemester.xlsx')
