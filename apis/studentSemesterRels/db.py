@@ -85,16 +85,23 @@ def __doDelete(id):
   return instance
 def __doFind(model):
   whereClause = "WHERE sem.idSemester = :idSemester AND pt.idProjecttype = :idProjecttype"
+  whereClause1 = "WHERE 1=1"
   params = {
     'idSemester': model['idSemester'],
     'idProjecttype': 17
   }
-  if model.get('email', None) != None:
-    whereClause += " AND stu.email like :email_pattern"
-    params['email_pattern'] = f'%{model["email"]}%'
+  if model.get('title', None) != None:
+    whereClause += " AND prj.title like :title_pattern"
+    params['title_pattern'] = f'%{model["title"]}%'
+  if model.get('studentNumber', None) != None:
+    whereClause += " AND stu.studentNumber = :studentNumber"
+    params['studentNumber'] = model["studentNumber"]
   if model.get('fullname', None) != None:
     whereClause += " AND stu.fullname like :fullname_pattern"
     params['fullname_pattern'] = f'%{model["fullname"]}%'
+  if model.get('advisors', None) != None:
+    whereClause1 += " AND advisors like :advisor_pattern"
+    params['advisor_pattern'] = f'%{model["advisors"]}%'
 
   queryStr = """
     SELECT prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel,
@@ -118,6 +125,7 @@ def __doFind(model):
   queryStr += whereClause
   groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel'
   queryStr += groupbyClause
+  queryStr = "SELECT * FROM (" + queryStr + ") q " + whereClause1
   doLog(queryStr)
   doLog(params)
 

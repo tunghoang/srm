@@ -128,7 +128,58 @@ def __doDelete(id):
   __db.session().delete(instance)
   __db.session().commit()
   return instance
+
 def __doFind(model):
+  whereClause = "WHERE 1=1"
+  whereClause1 = "WHERE 1=1"
+  params = { }
+  if model.get('email', None) != None:
+    whereClause += " AND stu.email like :email_pattern"
+    params['email_pattern'] = f'%{model["email"]}%'
+  if model.get('fullname', None) != None:
+    whereClause += " AND stu.fullname like :fullname_pattern"
+    params['fullname_pattern'] = f'%{model["fullname"]}%'
+  if model.get('title', None) != None:
+    whereClause += " AND prj.title like :title_pattern"
+    params['title_pattern'] = f'%{model["title"]}%'
+  if model.get('idProjecttype', None) != None:
+    whereClause += " AND pt.idProjecttype = :idProjecttype"
+    params['idProjecttype'] = model['idProjecttype']
+  if model.get('members', None) != None:
+    whereClause1 += " AND members like :member_pattern"
+    params['member_pattern'] = f'%{model["members"]}%'
+  if model.get('advisors', None) != None:
+    whereClause1 += " AND advisors like :advisor_pattern"
+    params['advisor_pattern'] = f'%{model["advisors"]}%'
+
+  queryStr = """
+    SELECT prj.title, prj.status, pt.name, sem.year, sem.semesterIndex, prj.idProject,
+      GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors, GROUP_CONCAT(stu.fullname SEPARATOR ',') as members
+    FROM projecttype as pt
+      RIGHT JOIN project as prj
+        ON prj.idProjecttype = pt.idProjecttype
+      LEFT JOIN projectStudentRel as prjStu 
+        ON prj.idProject = prjStu.idProject
+      LEFT JOIN student as stu
+        on prjStu.idStudent = stu.idStudent
+      JOIN semester as sem 
+        ON prj.idSemester = sem.idSemester
+      LEFT JOIN projectAdvisorRel as prjAdv
+        ON prj.idProject = prjAdv.idProject
+      LEFT JOIN advisor as adv
+        ON prjAdv.idAdvisor = adv.idAdvisor
+  """
+  queryStr += whereClause
+  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, prj.idProject'
+  queryStr += groupbyClause
+  queryStr = "SELECT * FROM (" + queryStr + ") q " + whereClause1
+  doLog(queryStr)
+  doLog(params)
+
+  results = __db.session().execute(queryStr, params).fetchall()
+  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'semester_year': x[3], 'semester_semesterIndex': x[4], 'idProject':x[5], 'advisors': x[6], 'members':x[7]}, results))
+
+def __doFind1(model):
   if 'idAdvisor' in model:
     queryObj = __db.session().query(
       Project.idProject, 
