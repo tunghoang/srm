@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy import ForeignKey, Column, distinct, Integer, Float, String, Boolean, Date, DateTime, Text
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
@@ -202,7 +202,6 @@ def __doFind(model):
       'idProject': x[0], 'title': x[1], 'status': x[2], 'grade': x[3], 'idSemester': x[4], 'idProjecttype': x[5], 'year': x[6],
       'semesterIndex': x[7], 'projecttypeName': x[8], 'confirmed': x[11]
     }, results))
-
   return list(map(lambda x: {
     'idProject': x[0], 'title': x[1], 'status': x[2], 'grade': x[3], 'idSemester': x[4], 'idProjecttype': x[5], 'year': x[6],
     'semesterIndex': x[7], 'projecttypeName': x[8] 

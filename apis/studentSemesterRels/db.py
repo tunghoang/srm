@@ -84,8 +84,11 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  whereClause = "WHERE sem.idSemester = :idSemester"
-  params = {'idSemester': model['idSemester']}
+  whereClause = "WHERE sem.idSemester = :idSemester AND pt.idProjecttype = :idProjecttype"
+  params = {
+    'idSemester': model['idSemester'],
+    'idProjecttype': 17
+  }
   if model.get('email', None) != None:
     whereClause += " AND stu.email like :email_pattern"
     params['email_pattern'] = f'%{model["email"]}%'
@@ -94,7 +97,8 @@ def __doFind(model):
     params['fullname_pattern'] = f'%{model["fullname"]}%'
 
   queryStr = """
-    SELECT prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel
+    SELECT prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel,
+      GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors
     FROM projecttype as pt
       RIGHT JOIN project as prj
         ON prj.idProjecttype = pt.idProjecttype
@@ -106,13 +110,19 @@ def __doFind(model):
         ON stu.idStudent = stuSem.idStudent
       LEFT JOIN semester as sem 
         ON stuSem.idSemester = sem.idSemester
+      LEFT JOIN projectAdvisorRel as prjAdv
+        ON prj.idProject = prjAdv.idProject
+      LEFT JOIN advisor as adv
+        ON prjAdv.idAdvisor = adv.idAdvisor
   """
   queryStr += whereClause
+  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel'
+  queryStr += groupbyClause
   doLog(queryStr)
   doLog(params)
 
   results = __db.session().execute(queryStr, params).fetchall()
-  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'student_studentNumber': x[3], 'student_fullname': x[4], 'semester_year': x[5], 'semester_semesterIndex': x[6], 'idStudentSemesterRel': x[7]}, results))
+  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'student_studentNumber': x[3], 'student_fullname': x[4], 'semester_year': x[5], 'semester_semesterIndex': x[6], 'idStudentSemesterRel': x[7], 'advisors': x[8]}, results))
 
 
 def listStudentsemesterrels():
