@@ -13,7 +13,7 @@ app = Flask(__name__, static_url_path='/public', static_folder='public')
 #app.wsgi_app = ProxyFix(app.wsgi_app)
 app.config['DEBUG'] = False
 app.config['JSON_AS_ASCII'] = False
-app.config['SERVER_NAME'] = "localhost:8000"
+app.config['SERVER_NAME'] = os.getenv("SERVER_NAME","localhost:8000")
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = '/tmp'
 #app.config['SESSION_COOKIE_SECURE'] = True
