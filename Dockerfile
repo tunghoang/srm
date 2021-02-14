@@ -1,8 +1,14 @@
-FROM python:3.8.2-alpine3.11
-RUN mkdir /opt/srm
-COPY apis /opt/srm
-COPY public /opt/srm
-COPY specs /opt/srm
-COPY *.py /opt/srm
-COPY config.ini /opt/srm
-RUN pip install
+FROM python:3
+WORKDIR /opt/srm
+COPY apis ./
+COPY public ./
+COPY specs ./
+COPY *.py ./
+COPY config.ini ./
+COPY requirements.txt ./
+
+RUN apt-get update
+RUN apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
+RUN pip install --no-cache-dir -r requirements.txt
+
+CMD [ "gunicorn", "-c gconfig.py", "app:app" ]
