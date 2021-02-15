@@ -145,16 +145,26 @@ def __doFind(model):
   if model.get('idProjecttype', None) != None:
     whereClause += " AND pt.idProjecttype = :idProjecttype"
     params['idProjecttype'] = model['idProjecttype']
+  if model.get('status', None) != None:
+    whereClause += " AND prj.status = :status"
+    params['status'] = model['status']
   if model.get('members', None) != None:
     whereClause1 += " AND members like :member_pattern"
     params['member_pattern'] = f'%{model["members"]}%'
   if model.get('advisors', None) != None:
     whereClause1 += " AND advisors like :advisor_pattern"
     params['advisor_pattern'] = f'%{model["advisors"]}%'
+  if model.get('idAdvisor', None) != None:
+    whereClause1 += " AND JSON_CONTAINS(advisorIds, :idAdvisor, '$') = 1"
+    params['idAdvisor'] = model["idAdvisor"]
+  if model.get('idStudent', None) != None:
+    whereClause1 += " AND JSON_CONTAINS(memberIds, :idStudent, '$') = 1"
+    params['idStudent'] = model["idStudent"]
 
   queryStr = """
-    SELECT prj.title, prj.status, pt.name, sem.year, sem.semesterIndex, prj.idProject,
-      GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors, GROUP_CONCAT(stu.fullname SEPARATOR ',') as members
+    SELECT prj.title, prj.status, pt.name, sem.year, sem.semesterIndex, prj.idProject, prjAdv.status as confirmed,
+      GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors, GROUP_CONCAT(stu.fullname SEPARATOR ',') as members,
+      JSON_ARRAYAGG(adv.idAdvisor) as advisorIds, JSON_ARRAYAGG(stu.idStudent) as memberIds
     FROM projecttype as pt
       RIGHT JOIN project as prj
         ON prj.idProjecttype = pt.idProjecttype
@@ -170,14 +180,14 @@ def __doFind(model):
         ON prjAdv.idAdvisor = adv.idAdvisor
   """
   queryStr += whereClause
-  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, prj.idProject'
+  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, prj.idProject, prjAdv.status'
   queryStr += groupbyClause
   queryStr = "SELECT * FROM (" + queryStr + ") q " + whereClause1
   doLog(queryStr)
   doLog(params)
 
   results = __db.session().execute(queryStr, params).fetchall()
-  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'semester_year': x[3], 'semester_semesterIndex': x[4], 'idProject':x[5], 'advisors': x[6], 'members':x[7]}, results))
+  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'semester_year': x[3], 'semester_semesterIndex': x[4], 'idProject':x[5], 'confirmed': x[6], 'advisors': x[7], 'members':x[8]}, results))
 
 def __doFind1(model):
   if 'idAdvisor' in model:
