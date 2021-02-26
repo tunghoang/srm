@@ -104,8 +104,9 @@ def __doFind(model):
     params['advisor_pattern'] = f'%{model["advisors"]}%'
 
   queryStr = """
-    SELECT prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel,
-      GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors
+    SELECT prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, stu.klass, 
+      GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors,
+      GROUP_CONCAT(IFNULL(guest.affiliation, 'DHCN') SEPARATOR ',') as affiliations
     FROM projecttype as pt
       RIGHT JOIN project as prj
         ON prj.idProjecttype = pt.idProjecttype
@@ -121,16 +122,35 @@ def __doFind(model):
         ON prj.idProject = prjAdv.idProject
       LEFT JOIN advisor as adv
         ON prjAdv.idAdvisor = adv.idAdvisor
+      LEFT JOIN guestadvisor as guest
+        ON adv.idGuestadvisor = guest.idGuestadvisor
   """
   queryStr += whereClause
-  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel'
+  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, stu.klass'
   queryStr += groupbyClause
-  queryStr = "SELECT * FROM (" + queryStr + ") q " + whereClause1
+  queryStr = """
+    SELECT *,
+	RIGHT(fullname, INSTR(REVERSE(fullname), " ") - 1) as name,
+	LEFT(fullname, CHAR_LENGTH(fullname) - INSTR(REVERSE(fullname), " ")) as firstAndMiddleName
+    FROM (%s) q 
+    %s
+    ORDER BY klass, name, firstAndMiddleName
+  """ % (queryStr, whereClause1)
   doLog(queryStr)
   doLog(params)
 
   results = __db.session().execute(queryStr, params).fetchall()
-  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'student_studentNumber': x[3], 'student_fullname': x[4], 'semester_year': x[5], 'semester_semesterIndex': x[6], 'idStudentSemesterRel': x[7], 'advisors': x[8]}, results))
+  return list(map(lambda x: {
+    'student_studentNumber': x[3], 
+    'student_fullname': x[4], 
+    'student_dob': str(x[8]),
+    'student_klass': x[9], 
+    'project_title': x[0], 
+    'advisors': x[10],
+    'affiliations': x[11],
+    'project_status': x[1], 
+    'project_type': x[2], 'semester_year': x[5], 'semester_semesterIndex': x[6], 'idStudentSemesterRel': x[7]
+  }, results))
 
 
 def listStudentsemesterrels():

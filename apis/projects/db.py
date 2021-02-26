@@ -180,7 +180,8 @@ def __doFind(model):
         ON prjAdv.idAdvisor = adv.idAdvisor
   """
   queryStr += whereClause
-  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, prj.idProject, prjAdv.status'
+  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, sem.year, sem.semesterIndex, prj.idProject, prjAdv.status'
+
   queryStr += groupbyClause
   queryStr = "SELECT * FROM (" + queryStr + ") q " + whereClause1
   doLog(queryStr)
