@@ -158,13 +158,14 @@ def __doFind(model):
     whereClause1 += " AND JSON_CONTAINS(advisorIds, :idAdvisor, '$') = 1"
     params['idAdvisor'] = model["idAdvisor"]
   if model.get('idStudent', None) != None:
-    whereClause1 += " AND JSON_CONTAINS(memberIds, :idStudent, '$') = 1"
+    #whereClause1 += " AND JSON_CONTAINS(memberIds, :idStudent, '$') = 1"
+    whereClause1 += " AND idStudent = :idStudent"
     params['idStudent'] = model["idStudent"]
 
   queryStr = """
     SELECT prj.title, prj.status, pt.name, sem.year, sem.semesterIndex, prj.idProject, prjAdv.status as confirmed,
-      GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors, GROUP_CONCAT(stu.fullname SEPARATOR ',') as members,
-      JSON_ARRAYAGG(adv.idAdvisor) as advisorIds, JSON_ARRAYAGG(stu.idStudent) as memberIds
+      GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors, stu.fullname as members, stu.studentNumber as MSSV,
+      JSON_ARRAYAGG(adv.idAdvisor) as advisorIds, stu.idStudent as idStudent
     FROM projecttype as pt
       RIGHT JOIN project as prj
         ON prj.idProjecttype = pt.idProjecttype
@@ -180,7 +181,7 @@ def __doFind(model):
         ON prjAdv.idAdvisor = adv.idAdvisor
   """
   queryStr += whereClause
-  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, sem.year, sem.semesterIndex, prj.idProject, prjAdv.status'
+  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, sem.year, sem.semesterIndex, prj.idProject, prjAdv.status, stu.fullname, stu.studentNumber, stu.idStudent'
 
   queryStr += groupbyClause
   queryStr = "SELECT * FROM (" + queryStr + ") q " + whereClause1
@@ -188,7 +189,7 @@ def __doFind(model):
   doLog(params)
 
   results = __db.session().execute(queryStr, params).fetchall()
-  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'semester_year': x[3], 'semester_semesterIndex': x[4], 'idProject':x[5], 'confirmed': x[6], 'advisors': x[7], 'members':x[8]}, results))
+  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'semester_year': x[3], 'semester_semesterIndex': x[4], 'idProject':x[5], 'confirmed': x[6], 'advisors': x[7], 'student':x[8], 'studentNumber': x[9]}, results))
 
 def __doFind1(model):
   if 'idAdvisor' in model:

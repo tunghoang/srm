@@ -88,17 +88,21 @@ def __doGet(id):
   #return instance
 
 def __doUpdate(id, model):
-  instance = getAdvisor(id)
+  #instance = getAdvisor(id)
+  instance = __db.session().query(Advisor).filter(Advisor.idAdvisor == id).scalar()
   if instance == None:
     return {}
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
-  instance = getAdvisor(id)
+  #instance = getAdvisor(id)
+  instance = __db.session().query(Advisor).filter(Advisor.idAdvisor == id).scalar()
+  idGuestAdvisor = instance.idGuestadvisor  
   __db.session().delete(instance)
   __db.session().commit()
   return instance
+
 def __doFind(model):
   if 'email' in model:
     results = __db.session().query(Advisor).filter(Advisor.email.ilike(f"%{model['email']}%")).all()

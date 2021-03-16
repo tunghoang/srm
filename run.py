@@ -7,8 +7,12 @@ from apis.advisors import Advisor
 def importAdvisorsFromLDAP():
   print("Hello world")
   __db = DbInstance.getInstance()
-  #result = search('ou=dhcn,ou=canbo,dc=vnu,dc=vn', 'tunghx')
-  results = doList('ou=khoa,ou=dhcn,ou=canbo,dc=vnu,dc=vn')
+  result = search('ou=dhcn,ou=canbo,dc=vnu,dc=vn', 'tunghx')
+  #results = doList('ou=bgh,ou=dhcn,ou=canbo,dc=vnu,dc=vn')
+  #results = doList('ou=phongthinghiem,ou=dhcn,ou=canbo,dc=vnu,dc=vn')
+  results = doList("ou=cntt,ou=khoa,ou=dhcn,ou=canbo,dc=vnu,dc=vn")
+  #results = doList('ou=trungtam,ou=dhcn,ou=canbo,dc=vnu,dc=vn')
+  #results = doList('ou=phongban,ou=dhcn,ou=canbo,dc=vnu,dc=vn')
   print(len(results))
   print("==================")
   for r in results:
@@ -41,15 +45,16 @@ def seedProjectsFromExcel(path, year, semesterIndex):
   idSemester = semesters[0].idSemester
   print(idSemester)
 
-  data = read_excel(path, sheet_name='Data', skiprows=1)
+  data = read_excel(path, sheet_name='Data', skiprows=0)
   values = data._values
+  print(len(values));
   for row in values:
     try:
       studentObj = {
         'studentNumber' : int(row[1]),
         'fullname': row[2].strip(),
         'email': f'{int(row[1])}@vnu.edu.vn',
-        'dob': datetime.strptime(row[3].strip(), "%d/%m/%Y").date(),
+        'dob': datetime.strptime(row[3].strip(), "%m/%d/%Y").date(),
         'klass': row[4]
       }
       idStudent = None
@@ -62,7 +67,7 @@ def seedProjectsFromExcel(path, year, semesterIndex):
         idStudent = results[0].idStudent
       projectObj = {
         'title': row[5],
-        'idProjecttype': 17,
+        'idProjecttype': 1,
         'idSemester': idSemester,
         'status': 'on-going'
       }
@@ -103,14 +108,13 @@ def seedProjectsFromExcel(path, year, semesterIndex):
       #  'idAdvisor1': int(row[10]) if not math.isnan(row[10]) else None
       #}
     except Exception as e:
-      f2.write(str(e))
-      f2.write("\n")
-      print(row)
-      f2.write("\n")
+      f2.write(str(e) + "\n")
+      f2.write(str(row))
       f2.write("\n")
     #print(rowObj)
   f1.close()
   f2.close()
 
 #importAdvisorsFromLDAP()
-seedProjectsFromExcel('fit2016.xlsx', 2020, 1)
+#seedProjectsFromExcel('fit2016.xlsx', 2020, 1)
+seedProjectsFromExcel('fit2021.xlsx', 2020, 1)

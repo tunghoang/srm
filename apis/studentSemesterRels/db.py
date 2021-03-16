@@ -88,7 +88,7 @@ def __doFind(model):
   whereClause1 = "WHERE 1=1"
   params = {
     'idSemester': model['idSemester'],
-    'idProjecttype': 17
+    'idProjecttype': 1
   }
   if model.get('title', None) != None:
     whereClause += " AND prj.title like :title_pattern"

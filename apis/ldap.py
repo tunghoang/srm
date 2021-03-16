@@ -78,3 +78,12 @@ def authenticate(dn, cred):
     return True
   except ldap.INVALID_CREDENTIALS as e:
     return False
+
+def rename(dn, newdn, newsuperior):
+  conn = None
+  try:
+    conn = _getLDAPConnection()
+    conn.rename_s(dn, newdn, newsuperior)
+  except Exception as e:
+    raise Exception("Cannot connect to LDAP server: " + e)
+
