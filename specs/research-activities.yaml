@@ -403,3 +403,22 @@ namespaces:
         type: String
     list_api: do logout
     list_api_description: do login
+  - ns_name: configs
+    ns_description: configs
+    resource_name: config
+    props:
+      - name: idConfig
+        type: Integer
+        primary_key: yes
+      - name: key
+        type: String
+        type_specs: (50)
+      - name: value
+        type: String
+        type_specs: (50)
+    list_api: list global configs
+    list_api_description: list global configs
+    new_api: new global config
+    new_api_description: new global config
+    update_api: update global config
+    update_api_description: update global config
