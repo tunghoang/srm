@@ -37,3 +37,5 @@ from .studentlogin import create_api as create_studentlogin
 api.add_namespace(create_studentlogin())
 from .logout import create_api as create_logout
 api.add_namespace(create_logout())
+from .configs import create_api as create_configs
+api.add_namespace(create_configs())
