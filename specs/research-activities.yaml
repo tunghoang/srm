@@ -159,6 +159,7 @@ namespaces:
         type_specs: (100)
       - name: category
         type: String
+        type_specs: (50)
     list_api: list classes
     list_api_description: list classes
     new_api: create class
