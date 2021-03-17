@@ -15,7 +15,7 @@ class Klass(__db.Base):
   __tablename__ = "klass"
   idKlass = Column(Integer, primary_key = True)
   className = Column(String(100))
-  category = Column(String)
+  category = Column(String(50))
 
   constraints = list()
   if len(constraints) > 0:
