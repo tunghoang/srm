@@ -11,70 +11,45 @@ __db = DbInstance.getInstance()
 
 
 
-class Student(__db.Base):
-  __tablename__ = "student"
-  idStudent = Column(Integer, primary_key = True)
-  studentNumber = Column(Integer)
-  email = Column(String(100))
-  fullname = Column(String(150))
-  dob = Column(Date)
-  gender = Column(Boolean)
-  klass = Column(String(20))
-  idKlass = Column(Integer, ForeignKey('klass.idKlass'))
+class Klass(__db.Base):
+  __tablename__ = "klass"
+  idKlass = Column(Integer, primary_key = True)
+  className = Column(String(100))
+  category = Column(String)
 
   constraints = list()
   if len(constraints) > 0:
     __table_args__ = tuple(constraints)
  
   def __init__(self, dictModel):
-    if ("idStudent" in dictModel) and (dictModel["idStudent"] != None):
-      self.idStudent = dictModel["idStudent"]
-    if ("studentNumber" in dictModel) and (dictModel["studentNumber"] != None):
-      self.studentNumber = dictModel["studentNumber"]
-    if ("email" in dictModel) and (dictModel["email"] != None):
-      self.email = dictModel["email"]
-    if ("fullname" in dictModel) and (dictModel["fullname"] != None):
-      self.fullname = dictModel["fullname"]
-    if ("dob" in dictModel) and (dictModel["dob"] != None):
-      self.dob = dictModel["dob"]
-    if ("gender" in dictModel) and (dictModel["gender"] != None):
-      self.gender = dictModel["gender"]
-    if ("klass" in dictModel) and (dictModel["klass"] != None):
-      self.klass = dictModel["klass"]
     if ("idKlass" in dictModel) and (dictModel["idKlass"] != None):
       self.idKlass = dictModel["idKlass"]
+    if ("className" in dictModel) and (dictModel["className"] != None):
+      self.className = dictModel["className"]
+    if ("category" in dictModel) and (dictModel["category"] != None):
+      self.category = dictModel["category"]
 
   def __repr__(self):
-    return '<Student idStudent={} studentNumber={} email={} fullname={} dob={} gender={} klass={} idKlass={} >'.format(self.idStudent, self.studentNumber, self.email, self.fullname, self.dob, self.gender, self.klass, self.idKlass, )
+    return '<Klass idKlass={} className={} category={} >'.format(self.idKlass, self.className, self.category, )
 
   def json(self):
     return {
-      "idStudent":self.idStudent,"studentNumber":self.studentNumber,"email":self.email,"fullname":self.fullname,"dob":self.dob,"gender":self.gender,"klass":self.klass,"idKlass":self.idKlass,
+      "idKlass":self.idKlass,"className":self.className,"category":self.category,
     }
 
   def update(self, dictModel):
-    if ("idStudent" in dictModel) and (dictModel["idStudent"] != None):
-      self.idStudent = dictModel["idStudent"]
-    if ("studentNumber" in dictModel) and (dictModel["studentNumber"] != None):
-      self.studentNumber = dictModel["studentNumber"]
-    if ("email" in dictModel) and (dictModel["email"] != None):
-      self.email = dictModel["email"]
-    if ("fullname" in dictModel) and (dictModel["fullname"] != None):
-      self.fullname = dictModel["fullname"]
-    if ("dob" in dictModel) and (dictModel["dob"] != None):
-      self.dob = dictModel["dob"]
-    if ("gender" in dictModel) and (dictModel["gender"] != None):
-      self.gender = dictModel["gender"]
-    if ("klass" in dictModel) and (dictModel["klass"] != None):
-      self.klass = dictModel["klass"]
     if ("idKlass" in dictModel) and (dictModel["idKlass"] != None):
       self.idKlass = dictModel["idKlass"]
+    if ("className" in dictModel) and (dictModel["className"] != None):
+      self.className = dictModel["className"]
+    if ("category" in dictModel) and (dictModel["category"] != None):
+      self.category = dictModel["category"]
 
 def __recover():
   __db.newSession()
 
 def __doList():
-  return __db.session().query(Student).all()
+  return __db.session().query(Klass).all()
   
 def __doNew(instance):
   __db.session().add(instance)
@@ -82,28 +57,28 @@ def __doNew(instance):
   return instance
 
 def __doGet(id):
-  instance = __db.session().query(Student).filter(Student.idStudent == id).scalar()
+  instance = __db.session().query(Klass).filter(Klass.idKlass == id).scalar()
   doLog("__doGet: {}".format(instance))
   return instance
 
 def __doUpdate(id, model):
-  instance = getStudent(id)
+  instance = getKlass(id)
   if instance == None:
     return {}
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
-  instance = getStudent(id)
+  instance = getKlass(id)
   __db.session().delete(instance)
   __db.session().commit()
   return instance
 def __doFind(model):
-  results = __db.session().query(Student).filter_by(**model).all()
+  results = __db.session().query(Klass).filter_by(**model).all()
   return results
 
 
-def listStudents():
+def listKlasss():
   doLog("list DAO function")
   try:
     return __doList()
@@ -119,9 +94,9 @@ def listStudents():
     __db.session().rollback()
     raise e
 
-def newStudent(model):
+def newKlass(model):
   doLog("new DAO function. model: {}".format(model))
-  instance = Student(model)
+  instance = Klass(model)
   res = False
   try:
     return __doNew(instance)
@@ -133,7 +108,7 @@ def newStudent(model):
     __db.session().rollback()
     raise e
 
-def getStudent(id):
+def getKlass(id):
   doLog("get DAO function", id)
   try:
     return __doGet(id)
@@ -149,7 +124,7 @@ def getStudent(id):
     __db.session().rollback()
     raise e
 
-def updateStudent(id, model):
+def updateKlass(id, model):
   doLog("update DAO function. Model: {}".format(model))
   try:
     return __doUpdate(id, model)
@@ -161,7 +136,7 @@ def updateStudent(id, model):
     __db.session().rollback()
     raise e
 
-def deleteStudent(id):
+def deleteKlass(id):
   doLog("delete DAO function", id)
   try:
     return __doDelete(id)
@@ -173,7 +148,7 @@ def deleteStudent(id):
     __db.session().rollback()
     raise e
 
-def findStudent(model):
+def findKlass(model):
   doLog("find DAO function %s" % model)
   try:
     return __doFind(model)
