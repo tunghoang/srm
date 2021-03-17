@@ -134,6 +134,9 @@ namespaces:
         type: Boolean
       - name: klass
         type: String(20)
+      - name: idKlass
+        type: Integer
+        foreign_key: klass.idKlass
     list_api: list students
     list_api_description: list students
     new_api: create student
@@ -144,6 +147,28 @@ namespaces:
     delete_api_description: delete student
     find_api: find students
     find_api_description: find students
+  - ns_name: klass
+    ns_description: student class
+    resource_name: klass
+    props:
+      - name: idKlass
+        type: Integer
+        primary_key: yes
+      - name: className
+        type: String
+        type_specs: (100)
+      - name: category
+        type: String
+    list_api: list classes
+    list_api_description: list classes
+    new_api: create class
+    new_api_description: create class
+    update_api: edit class
+    update_api_description: edit class
+    delete_api: delete class
+    delete_api_description: delete class
+    find_api: find class
+    find_api_description: find class
   - ns_name: semesters
     ns_description: semesters namespace (hoc ky)
     resource_name: semester

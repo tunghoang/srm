@@ -11,6 +11,8 @@ from .staffs import create_api as create_staffs
 api.add_namespace(create_staffs())
 from .students import create_api as create_students
 api.add_namespace(create_students())
+from .klass import create_api as create_klass
+api.add_namespace(create_klass())
 from .semesters import create_api as create_semesters
 api.add_namespace(create_semesters())
 from .projecttypes import create_api as create_projecttypes
