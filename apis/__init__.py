@@ -42,3 +42,5 @@ api.add_namespace(uploadApi)
 from .exports import exportAdvisorApi,exportStudentSemesterApi
 api.add_namespace(exportAdvisorApi)
 api.add_namespace(exportStudentSemesterApi)
+from .configs import create_api as create_configs
+api.add_namespace(create_configs())
