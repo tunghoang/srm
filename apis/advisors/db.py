@@ -197,10 +197,12 @@ def findAdvisor(model):
 
 def __doDump():
   queryStr = """
-    SELECT a.idAdvisor, a.fullname, a.email, a.idGuestadvisor, g.affiliation
+    SELECT a.idAdvisor, a.fullname, a.email, a.idGuestadvisor, g.affiliation, q.name
     FROM advisor a 
       LEFT JOIN guestadvisor g 
         ON a.idGuestadvisor = g.idGuestadvisor
+      LEFT JOIN quota q
+        ON q.idQuota = a.idQuota
   """
   results = __db.session().execute(queryStr).fetchall()
   return list(map(lambda result: {
@@ -208,7 +210,8 @@ def __doDump():
     'fullname': result[1],
     'email': result[2],
     'idGuestadvisor': result[3],
-    'affiliation': result[4]
+    'affiliation': result[4],
+    'title': result[5]
   }, results))
   
 def dumpAdvisors():
