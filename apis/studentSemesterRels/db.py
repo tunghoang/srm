@@ -104,7 +104,7 @@ def __doFind(model):
     params['advisor_pattern'] = f'%{model["advisors"]}%'
 
   queryStr = """
-    SELECT prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, stu.klass, 
+    SELECT prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, k.className, 
       GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors,
       GROUP_CONCAT(IFNULL(guest.affiliation, 'DHCN') SEPARATOR ',') as affiliations
     FROM projecttype as pt
@@ -114,6 +114,8 @@ def __doFind(model):
         ON prj.idProject = prjStu.idProject
       LEFT JOIN student as stu
         on prjStu.idStudent = stu.idStudent
+      LEFT JOIN klass as k
+        on stu.idKlass = k.idKlass
       RIGHT JOIN studentSemesterRel as stuSem
         ON stu.idStudent = stuSem.idStudent
       LEFT JOIN semester as sem 
@@ -126,7 +128,7 @@ def __doFind(model):
         ON adv.idGuestadvisor = guest.idGuestadvisor
   """
   queryStr += whereClause
-  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, stu.klass'
+  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, k.className'
   queryStr += groupbyClause
   queryStr = """
     SELECT *,
@@ -134,7 +136,7 @@ def __doFind(model):
 	LEFT(fullname, CHAR_LENGTH(fullname) - INSTR(REVERSE(fullname), " ")) as firstAndMiddleName
     FROM (%s) q 
     %s
-    ORDER BY klass, name, firstAndMiddleName
+    ORDER BY className, name, firstAndMiddleName
   """ % (queryStr, whereClause1)
   doLog(queryStr)
   doLog(params)

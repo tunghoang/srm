@@ -10,8 +10,8 @@ def init_routes(api, model):
       '''list quotas'''
       return listQuotas()
     @api.doc('find quotas')
-    @api.expect(model)
-    @api.marshal_list_with(model)
+    #@api.expect(model)
+    #@api.marshal_list_with(model)
     def put(self):
       '''find quotas'''
       return findQuota(api.payload)

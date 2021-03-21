@@ -84,9 +84,52 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  results = __db.session().query(Quota).filter_by(**model).all()
-  return results
+  ''' implement quota checking here '''
+  idSemester = model.get('idSemester', None)
+  if idSemester is None:
+    raise BadRequest('idSemester missing')
+  whereClause = "WHERE sem.idSemester = :idSemester AND prj.idProjecttype = 1"
+  params = {'idSemester':idSemester}
 
+  if model.get('advisor', None) != None:
+    whereClause += " AND adv.fullname like :advisor_pattern"
+    params['advisor_pattern'] = f'%{model["advisor"]}%'
+
+  queryStr = '''
+    SELECT adv.idAdvisor, adv.fullname, sem.idSemester, sem.year, sem.semesterIndex, count(prj.title), quo.name, adv.idGuestadvisor, 
+      quo.n_kltn, sum(1.0/subq.count) 
+    FROM project prj
+      LEFT JOIN (
+        SELECT prj1.idProject, prj1.title, count(adv1.idAdvisor) count
+        FROM project prj1 
+          LEFT JOIN projectAdvisorRel par1
+            ON prj1.idProject = par1.idProject
+          RIGHT JOIN advisor adv1
+            ON par1.idAdvisor = adv1.idAdvisor
+        GROUP BY prj1.idProject, prj1.title
+      ) subq
+      ON prj.idProject = subq.idProject
+      LEFT JOIN projectAdvisorRel par
+        ON prj.idProject = par.idProject
+      RIGHT JOIN advisor adv
+        ON par.idAdvisor = adv.idAdvisor
+      LEFT JOIN quota quo
+        ON adv.idQuota = quo.idQuota
+      LEFT JOIN projectStudentRel psr
+        ON prj.idProject = psr.idProject
+      RIGHT JOIN student stu
+        ON psr.idStudent = stu.idStudent
+      LEFT JOIN studentSemesterRel ssr
+        ON stu.idStudent = ssr.idStudent
+      RIGHT JOIN semester sem
+        ON ssr.idSemester = sem.idSemester
+  ''' + whereClause + '''
+    GROUP BY adv.idAdvisor, adv.fullname, sem.idSemester, sem.year, sem.semesterIndex, quo.name, adv.idGuestadvisor, quo.n_kltn
+  '''
+  results = __db.session().execute(queryStr, params).fetchall()
+  return list(map(lambda x: {'idAdvisor': x[0], 
+      'advisor': x[1], 'semester': str(x[3]) + "-HK" + str(x[4]+1), 
+      'count': x[5], 'title': x[6], 'idGuestadvisor':x[7], 'quota':x[8], 'count1': float(x[9])}, results))
 
 def listQuotas():
   doLog("list DAO function")
