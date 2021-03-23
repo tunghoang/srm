@@ -13,6 +13,7 @@ from ..students import Student
 from ..advisors import Advisor
 from ..semesters import Semester
 from ..projecttypes import Projecttype
+from ..configs.db import findConfig
 
 __db = DbInstance.getInstance()
 
@@ -117,6 +118,9 @@ def __doGet(id):
   return instance
 
 def __doUpdate(id, model):
+  configs = findConfig({'key': 'Allow edit project'})
+  if (configs[0].value == ""):
+    raise BadRequest("Không thể sửa đổi được do đang không trong thời gian sửa đổi để tài");
   instance = getProject(id)
   if instance == None:
     return {}

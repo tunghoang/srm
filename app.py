@@ -13,7 +13,8 @@ if not os.path.isdir(__SESSION_DIR):
   os.mkdir(__SESSION_DIR);
 app = Flask(__name__, static_url_path='/public', static_folder='public')
 #app.wsgi_app = ProxyFix(app.wsgi_app)
-app.config['DEBUG'] = False
+app.config['DEBUG'] = True
+app.config['SECRET_KEY'] = 'srm2021cntt'
 app.config['JSON_AS_ASCII'] = False
 app.config['SERVER_NAME'] = os.getenv("SERVER_NAME","localhost:8000")
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -35,8 +36,6 @@ def before_request():
   #no_auth_prefixes = ( '/swaggerui', '/')
   no_auth_prefixes = ( '/swaggerui', '/studentlogin', '/stafflogin', '/advisorlogin', '/guestlogin', '/upload' )
 
-  print(key)
-  print(jwt)
   if request.path in no_auth_routes or matchOneOf(request.path, no_auth_prefixes) :
     return None
   elif jwt is None or key is None:
