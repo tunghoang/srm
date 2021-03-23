@@ -234,6 +234,8 @@ namespaces:
         type_specs: (20)
       - name: grade
         type: Float
+      - name: titleConfirm
+        type: Integer
     list_api: list projects
     list_api_description: list projects
     new_api: create project

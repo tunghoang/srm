@@ -27,6 +27,7 @@ class Project(__db.Base):
   idSemester = Column(Integer, ForeignKey('semester.idSemester'))
   status = Column(String(20))
   grade = Column(Float)
+  titleConfirm = Column(Integer)
 
   constraints = list()
   if len(constraints) > 0:
@@ -45,13 +46,15 @@ class Project(__db.Base):
       self.status = dictModel["status"]
     if ("grade" in dictModel) and (dictModel["grade"] != None):
       self.grade = dictModel["grade"]
+    if ("titleConfirm" in dictModel) and (dictModel["titleConfirm"] != None):
+      self.titleConfirm = dictModel["titleConfirm"]
 
   def __repr__(self):
-    return '<Project idProject={} title={} idProjecttype={} idSemester={} status={} grade={} >'.format(self.idProject, self.title, self.idProjecttype, self.idSemester, self.status, self.grade, )
+    return '<Project idProject={} title={} idProjecttype={} idSemester={} status={} grade={} titleConfirm={} >'.format(self.idProject, self.title, self.idProjecttype, self.idSemester, self.status, self.grade, self.titleConfirm, )
 
   def json(self):
     return {
-      "idProject":self.idProject,"title":self.title,"idProjecttype":self.idProjecttype,"idSemester":self.idSemester,"status":self.status,"grade":self.grade,
+      "idProject":self.idProject,"title":self.title,"idProjecttype":self.idProjecttype,"idSemester":self.idSemester,"status":self.status,"grade":self.grade,"titleConfirm":self.titleConfirm,
     }
 
   def update(self, dictModel):
@@ -67,6 +70,8 @@ class Project(__db.Base):
       self.status = dictModel["status"]
     if ("grade" in dictModel) and (dictModel["grade"] != None):
       self.grade = dictModel["grade"]
+    if ("titleConfirm" in dictModel) and (dictModel["titleConfirm"] != None):
+      self.titleConfirm = dictModel["titleConfirm"]
 
 def __recover():
   __db.newSession()

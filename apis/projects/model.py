@@ -7,6 +7,7 @@ def create_model(api):
     'idProjecttype': Integer,
     'idSemester': Integer,
     'status': String,
-    'grade': Float 
+    'grade': Float,
+    'titleConfirm': Integer 
   },mask='*');
   return model
