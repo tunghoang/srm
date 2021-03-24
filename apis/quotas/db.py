@@ -59,7 +59,9 @@ def __recover():
   __db.newSession()
 
 def __doList():
-  return __db.session().query(Quota).all()
+  result = __db.session().query(Quota).all()
+  __db.session().commit()
+  return result  
   
 def __doNew(instance):
   __db.session().add(instance)
@@ -69,6 +71,7 @@ def __doNew(instance):
 def __doGet(id):
   instance = __db.session().query(Quota).filter(Quota.idQuota == id).scalar()
   doLog("__doGet: {}".format(instance))
+  __db.session().commit()
   return instance
 
 def __doUpdate(id, model):
@@ -127,9 +130,12 @@ def __doFind(model):
     GROUP BY adv.idAdvisor, adv.fullname, sem.idSemester, sem.year, sem.semesterIndex, quo.name, adv.idGuestadvisor, quo.n_kltn
   '''
   results = __db.session().execute(queryStr, params).fetchall()
+  __db.session().commit()
   return list(map(lambda x: {'idAdvisor': x[0], 
       'advisor': x[1], 'semester': str(x[3]) + "-HK" + str(x[4]+1), 
       'count': x[5], 'title': x[6], 'idGuestadvisor':x[7], 'quota':x[8], 'count1': float(x[9])}, results))
+  return results
+
 
 def listQuotas():
   doLog("list DAO function")

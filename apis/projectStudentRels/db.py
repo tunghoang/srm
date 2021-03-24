@@ -55,7 +55,9 @@ def __recover():
   __db.newSession()
 
 def __doList():
-  return __db.session().query(Projectstudentrel).all()
+  result = __db.session().query(Projectstudentrel).all()
+  __db.session().commit()
+  return result  
   
 def __doNew(instance):
   __db.session().add(instance)
@@ -65,6 +67,7 @@ def __doNew(instance):
 def __doGet(id):
   instance = __db.session().query(Projectstudentrel).filter(Projectstudentrel.idProjectstudentrel == id).scalar()
   doLog("__doGet: {}".format(instance))
+  __db.session().commit()
   return instance
 
 def __doUpdate(id, model):
@@ -90,6 +93,7 @@ def __doFind(model):
 
   results = queryObj.all()
 
+  __db.session().commit()
   return list(map(lambda x:{'fullname':x[0], 'studentNumber':x[1], 'idStudent':x[2], 'idProject':x[3], 'idProjectstudentrel': x[4]}, results))
 
 

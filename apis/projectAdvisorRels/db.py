@@ -56,7 +56,9 @@ def __recover():
   __db.newSession()
 
 def __doList():
-  return __db.session().query(Projectadvisorrel).all()
+  result = __db.session().query(Projectadvisorrel).all()
+  __db.session().commit()
+  return result  
   
 def __doNew(instance):
   __db.session().add(instance)
@@ -66,6 +68,7 @@ def __doNew(instance):
 def __doGet(id):
   instance = __db.session().query(Projectadvisorrel).filter(Projectadvisorrel.idProjectadvisorrel == id).scalar()
   doLog("__doGet: {}".format(instance))
+  __db.session().commit()
   return instance
 
 def __doUpdate(id, model):
@@ -97,6 +100,7 @@ def __doFind(model):
     queryObj = queryObj.filter(Projectadvisorrel.status == model['status'])
 
   results = queryObj.all()
+  __db.session().commit()
   return list(map(lambda x: {'fullname': x[0], 'idAdvisor': x[1], 'idProject': x[2], 'idProjectadvisorrel': x[3], 'status': x[4]}, results))
 
 def listProjectadvisorrels():

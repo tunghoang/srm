@@ -60,7 +60,9 @@ def __recover():
   __db.newSession()
 
 def __doList():
-  return __db.session().query(Guestadvisor).all()
+  result = __db.session().query(Guestadvisor).all()
+  __db.session().commit()
+  return result  
   
 def __doNew(instance):
   doLog('__doNew____' + str(instance))
@@ -89,6 +91,7 @@ def __doNew(instance):
 def __doGet(id):
   instance = __db.session().query(Guestadvisor).filter(Guestadvisor.idGuestadvisor == id).scalar()
   doLog("__doGet: {}".format(instance))
+  __db.session().commit()
   return instance
 
 def __doUpdate(id, model):
@@ -105,6 +108,7 @@ def __doDelete(id):
   return instance
 def __doFind(model):
   results = __db.session().query(Guestadvisor).filter_by(**model).all()
+  __db.session().commit()
   return results
 
 

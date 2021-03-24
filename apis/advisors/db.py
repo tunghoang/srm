@@ -59,7 +59,9 @@ def __recover():
   __db.newSession()
 
 def __doList():
-  return __db.session().query(Advisor).all()
+  result = __db.session().query(Advisor).all()
+  __db.session().commit()
+  return result  
   
 def __doNew(instance):
   __db.session().add(instance)
@@ -76,6 +78,7 @@ def __doGet(id):
   """
   params = {'idAdvisor': id}
   result = __db.session().execute(queryStr, params).fetchone()
+  __db.session().commit()
   return {
     'idAdvisor': result[0], 
     'fullname': result[1],
@@ -110,6 +113,7 @@ def __doFind(model):
     results = __db.session().query(Advisor).filter(Advisor.fullname.ilike(f"%{model['fullname']}%")).all()
   else:
     results = __db.session().query(Advisor).filter_by(**model).all()
+  __db.session().commit()
   return results
 
 

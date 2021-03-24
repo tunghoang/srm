@@ -77,7 +77,9 @@ def __recover():
   __db.newSession()
 
 def __doList():
-  return __db.session().query(Project).all()
+  result = __db.session().query(Project).all()
+  __db.session().commit()
+  return result  
   
 def __doNew(instance):
   key = request.cookies.get('key')
@@ -120,6 +122,7 @@ def __doNew(instance):
 def __doGet(id):
   instance = __db.session().query(Project).filter(Project.idProject == id).scalar()
   doLog("__doGet: {}".format(instance))
+  __db.session().commit()
   return instance
 
 def __doUpdate(id, model):
@@ -198,6 +201,7 @@ def __doFind(model):
   doLog(params)
 
   results = __db.session().execute(queryStr, params).fetchall()
+  __db.session().commit()
   return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'semester_year': x[3], 'semester_semesterIndex': x[4], 'idProject':x[5], 'confirmed': x[6], 'advisors': x[7], 'student':x[8], 'studentNumber': x[9]}, results))
 
 def __doFind1(model):
