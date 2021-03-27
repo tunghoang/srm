@@ -2,11 +2,17 @@ from hashlib import sha256
 from flask import jsonify
 from jwt import encode, decode
 from werkzeug.exceptions import *
-
+import logging
+import logging.config
 from pandas import read_excel, DataFrame
 
 from .db_utils import config
 SALT = 'fitresact'
+
+logging.config.fileConfig(fname='logging.ini')
+
+def getLogger():
+  return logging.getLogger('SRM')
 def doHash(str):
   str1 = SALT + str
   hashObj = sha256(str1.encode('UTF-8'))
@@ -20,9 +26,9 @@ def doParseJWT(key, salt):
     return None
 def doLog(message, error = False):
   if error:
-    print("*** %s" % message)
+    getLogger().error("*** %s" % message)
   else:
-    print("--- %s" % message)
+    getLogger().info("--- %s" % message)
 def doClear(dict):
   keys = [ k for k in dict ]
   for key in keys:

@@ -9,6 +9,8 @@ from flask import session,request,after_this_request
 
 from ..advisors import Advisor
 
+from ..mail_utils import *
+
 __db = DbInstance.getInstance()
 
 
@@ -63,6 +65,7 @@ def __doList():
 def __doNew(instance):
   __db.session().add(instance)
   __db.session().commit()
+  notifyAdvisorNewProject(instance.idAdvisor, instance.idProject, instance.status)
   return instance
 
 def __doGet(id):
@@ -77,11 +80,14 @@ def __doUpdate(id, model):
     return {}
   instance.update(model)
   __db.session().commit()
+  notifyStudentAdvisorAccept(instance.idAdvisor, instance.idProject)
   return instance
+
 def __doDelete(id):
   instance = getProjectadvisorrel(id)
   __db.session().delete(instance)
   __db.session().commit()
+  notifyStudentAdvisorReject(instance.idAdvisor, instance.idProject)
   return instance
 
 def __doFind(model):

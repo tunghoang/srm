@@ -1,3 +1,4 @@
+from .app_utils import doLog
 import ldap
 _ldapConnection = None
 MAX_RETRIES = 3
@@ -72,7 +73,8 @@ def authenticate(dn, cred):
   try:
     conn = _getLDAPConnection()
   except Exception as e:
-    raise Exception("Cannot connecto to LDAP server: " + e)
+    doLog("Cannot connect to LDAP server: " + str(e))
+    return False
   try:
     conn.bind(dn, cred)
     return True
