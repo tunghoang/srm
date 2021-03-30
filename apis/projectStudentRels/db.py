@@ -8,9 +8,9 @@ from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
 from ..students import Student
+
+from ..sec_utils import *
 __db = DbInstance.getInstance()
-
-
 
 class Projectstudentrel(__db.Base):
   __tablename__ = "projectStudentRel"
@@ -144,6 +144,8 @@ def getProjectstudentrel(id):
     raise e
 
 def updateProjectstudentrel(id, model):
+  instance = getProjectstudentrel(id)
+  verifyIdStudent(request, session, instance.json())
   doLog("update DAO function. Model: {}".format(model))
   try:
     return __doUpdate(id, model)
@@ -156,6 +158,8 @@ def updateProjectstudentrel(id, model):
     raise e
 
 def deleteProjectstudentrel(id):
+  instance = getProjectstudentrel(id)
+  verifyIdStudent(request, session, instance.json())
   doLog("delete DAO function", id)
   try:
     return __doDelete(id)

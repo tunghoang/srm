@@ -7,6 +7,8 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+from ..sec_utils import *
+
 __db = DbInstance.getInstance()
 
 
@@ -99,6 +101,7 @@ def listKlasss():
     raise e
 
 def newKlass(model):
+  shouldBeStaff(request, session)
   doLog("new DAO function. model: {}".format(model))
   instance = Klass(model)
   res = False
@@ -129,6 +132,7 @@ def getKlass(id):
     raise e
 
 def updateKlass(id, model):
+  shouldBeStaff(request, session)
   doLog("update DAO function. Model: {}".format(model))
   try:
     return __doUpdate(id, model)
@@ -141,6 +145,7 @@ def updateKlass(id, model):
     raise e
 
 def deleteKlass(id):
+  shouldBeStaff(request, session)
   doLog("delete DAO function", id)
   try:
     return __doDelete(id)

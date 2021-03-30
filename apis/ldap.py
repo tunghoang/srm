@@ -18,7 +18,7 @@ def _getLDAPConnection():
   if not _ldapConnection:
     l = ldap.initialize(_conn_str)
     l.set_option(ldap.OPT_TIMEOUT, 7)
-    l.bind(_admin, _cred)
+    l.simple_bind_s(_admin, _cred)
     _ldapConnection = l
     _ldapConnectionRetries = MAX_RETRIES
 
@@ -76,7 +76,7 @@ def authenticate(dn, cred):
     doLog("Cannot connect to LDAP server: " + str(e))
     return False
   try:
-    conn.bind(dn, cred)
+    conn.simple_bind_s(dn, cred)
     return True
   except ldap.INVALID_CREDENTIALS as e:
     return False

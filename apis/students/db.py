@@ -7,6 +7,7 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+from ..sec_utils import *
 __db = DbInstance.getInstance()
 
 
@@ -129,6 +130,7 @@ def listStudents():
     raise e
 
 def newStudent(model):
+  shouldNotStudent(request, session)
   doLog("new DAO function. model: {}".format(model))
   instance = Student(model)
   res = False
@@ -159,6 +161,7 @@ def getStudent(id):
     raise e
 
 def updateStudent(id, model):
+  verifyIdStudent(request, session, {'idStudent': id})
   doLog("update DAO function. Model: {}".format(model))
   try:
     return __doUpdate(id, model)
@@ -171,6 +174,7 @@ def updateStudent(id, model):
     raise e
 
 def deleteStudent(id):
+  shouldNotStudent(request, session)
   doLog("delete DAO function", id)
   try:
     return __doDelete(id)

@@ -11,6 +11,7 @@ from ..advisors import Advisor
 
 from ..mail_utils import *
 
+from ..sec_utils import *
 __db = DbInstance.getInstance()
 
 
@@ -128,6 +129,8 @@ def listProjectadvisorrels():
 def newProjectadvisorrel(model):
   doLog("new DAO function. model: {}".format(model))
   instance = Projectadvisorrel(model)
+  if instance.status is not None and instance.status > 0:
+    raise BadRequest("Insufficient privilege to approve")
   res = False
   try:
     return __doNew(instance)
@@ -156,6 +159,7 @@ def getProjectadvisorrel(id):
     raise e
 
 def updateProjectadvisorrel(id, model):
+  shouldNotStudent(request, session)
   doLog("update DAO function. Model: {}".format(model))
   try:
     return __doUpdate(id, model)
@@ -168,6 +172,7 @@ def updateProjectadvisorrel(id, model):
     raise e
 
 def deleteProjectadvisorrel(id):
+  shouldNotStudent(request, session)
   doLog("delete DAO function", id)
   try:
     return __doDelete(id)

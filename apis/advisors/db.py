@@ -7,6 +7,7 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+from ..sec_utils import *
 __db = DbInstance.getInstance()
 
 
@@ -164,6 +165,7 @@ def getAdvisor(id):
     raise e
 
 def updateAdvisor(id, model):
+  shouldBeStaff(request, session)
   doLog("update DAO function. Model: {}".format(model))
   try:
     return __doUpdate(id, model)
@@ -176,6 +178,7 @@ def updateAdvisor(id, model):
     raise e
 
 def deleteAdvisor(id):
+  shouldBeStaff(request, session)
   doLog("delete DAO function", id)
   try:
     return __doDelete(id)

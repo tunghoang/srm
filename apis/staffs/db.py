@@ -6,6 +6,7 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
+from ..sec_utils import *
 
 __db = DbInstance.getInstance()
 
@@ -99,6 +100,7 @@ def listStaffs():
     raise e
 
 def newStaff(model):
+  shouldBeStaff(request, session)
   doLog("new DAO function. model: {}".format(model))
   instance = Staff(model)
   res = False
@@ -129,6 +131,7 @@ def getStaff(id):
     raise e
 
 def updateStaff(id, model):
+  shouldBeStaff(request, session)
   doLog("update DAO function. Model: {}".format(model))
   try:
     return __doUpdate(id, model)
@@ -141,6 +144,7 @@ def updateStaff(id, model):
     raise e
 
 def deleteStaff(id):
+  shouldBeStaff(request, session)
   doLog("delete DAO function", id)
   try:
     return __doDelete(id)

@@ -53,10 +53,8 @@ def doAuthenticate(uid, password):
   else:
     return False, 'Login failed'
 
-  # MOCK
-  #return {'fullname': "Nguyen Van A", "gender": True, 'dob': '2000-03-12'}
-
 def __doNew(instance):
+  print(request)
   uid = uidFromEmail(instance.email)
   success, data = doAuthenticate(uid, instance.password)
   if not success:

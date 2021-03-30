@@ -20,10 +20,7 @@ def doHash(str):
 def doGenJWT(obj, salt):
   return encode(obj, salt)
 def doParseJWT(key, salt):
-  try:
-    return decode(key, salt)
-  except: 
-    return None
+  return decode(key, salt)
 def doLog(message, error = False):
   if error:
     getLogger().error("*** %s" % message)

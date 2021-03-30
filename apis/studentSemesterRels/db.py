@@ -12,6 +12,8 @@ from ..projecttypes import Projecttype
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+from ..sec_utils import *
+
 __db = DbInstance.getInstance()
 
 
@@ -181,6 +183,7 @@ def listStudentsemesterrels():
     raise e
 
 def newStudentsemesterrel(model):
+  shouldBeStaff(request, session)
   doLog("new DAO function. model: {}".format(model))
   instance = Studentsemesterrel(model)
   res = False
@@ -211,6 +214,7 @@ def getStudentsemesterrel(id):
     raise e
 
 def updateStudentsemesterrel(id, model):
+  shouldBeStaff(request, session)
   doLog("update DAO function. Model: {}".format(model))
   try:
     return __doUpdate(id, model)
@@ -223,6 +227,7 @@ def updateStudentsemesterrel(id, model):
     raise e
 
 def deleteStudentsemesterrel(id):
+  shouldBeStaff(request, session)
   doLog("delete DAO function", id)
   try:
     return __doDelete(id)

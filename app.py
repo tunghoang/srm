@@ -44,7 +44,16 @@ def before_request():
     salt = session[key]
     try:
       sessionData = doParseJWT(jwt, salt)
-    except:
+      if sessionData.get('idStaff', None):
+        pass
+      elif (sessionData.get('idAdvisor', None)):
+        pass
+      elif (sessionData.get('idStudent', None)):
+        pass
+      else:
+        raise Exception('No id field in section')
+    except Exception as e:
+      doLog(str(e), True)
       raise Unauthorized("Invalid session")
   else:
     raise Unauthorized("Not login")
