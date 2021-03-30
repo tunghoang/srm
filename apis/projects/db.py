@@ -20,6 +20,7 @@ class Project(__db.Base):
   status = Column(String(20))
   grade = Column(Float)
   titleConfirm = Column(Integer)
+  description = Column(Text)
 
   constraints = list()
   if len(constraints) > 0:
@@ -40,13 +41,15 @@ class Project(__db.Base):
       self.grade = dictModel["grade"]
     if ("titleConfirm" in dictModel) and (dictModel["titleConfirm"] != None):
       self.titleConfirm = dictModel["titleConfirm"]
+    if ("description" in dictModel) and (dictModel["description"] != None):
+      self.description = dictModel["description"]
 
   def __repr__(self):
-    return '<Project idProject={} title={} idProjecttype={} idSemester={} status={} grade={} titleConfirm={} >'.format(self.idProject, self.title, self.idProjecttype, self.idSemester, self.status, self.grade, self.titleConfirm, )
+    return '<Project idProject={} title={} idProjecttype={} idSemester={} status={} grade={} titleConfirm={} description={} >'.format(self.idProject, self.title, self.idProjecttype, self.idSemester, self.status, self.grade, self.titleConfirm, self.description, )
 
   def json(self):
     return {
-      "idProject":self.idProject,"title":self.title,"idProjecttype":self.idProjecttype,"idSemester":self.idSemester,"status":self.status,"grade":self.grade,"titleConfirm":self.titleConfirm,
+      "idProject":self.idProject,"title":self.title,"idProjecttype":self.idProjecttype,"idSemester":self.idSemester,"status":self.status,"grade":self.grade,"titleConfirm":self.titleConfirm,"description":self.description,
     }
 
   def update(self, dictModel):
@@ -64,6 +67,8 @@ class Project(__db.Base):
       self.grade = dictModel["grade"]
     if ("titleConfirm" in dictModel) and (dictModel["titleConfirm"] != None):
       self.titleConfirm = dictModel["titleConfirm"]
+    if ("description" in dictModel) and (dictModel["description"] != None):
+      self.description = dictModel["description"]
 
 def __recover():
   __db.newSession()
