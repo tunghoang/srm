@@ -20,6 +20,7 @@ class Projectstudentrel(__db.Base):
   status = Column(Integer)
 
   constraints = list()
+  constraints.append(UniqueConstraint('idProject','idStudent'))
   if len(constraints) > 0:
     __table_args__ = tuple(constraints)
  
