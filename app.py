@@ -70,4 +70,4 @@ def after_request(resp):
 db.Base.metadata.create_all(db.engine)
 
 if __name__ == "__main__":
-  app.run()
+  app.run(debug=True)

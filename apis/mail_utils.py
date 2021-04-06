@@ -69,9 +69,9 @@ def notifyStudentAdvisorReject(idAdvisor, idProject):
   advisor = getAdvisor(idAdvisor)
   project = __getProject(idProject)
   receipient = ",".join(__getMemberEmails(idProject))
-  subject = f'[SRM] Thầy/cô {advisor["fullname"]} đã từ chối hướng dẫn'
+  subject = f'[SRM] Thầy/cô {advisor["fullname"]} đã TỪ CHỐI hướng dẫn'
   content = f"""
-    <p>Thầy/cô {advisor['fullname']} đã từ chối hướng dẫn đề tài <span style='color:#0f0'>{project['title']}</span>.</p>
+    <p>Thầy/cô {advisor['fullname']} đã ĐỒNG Ý hướng dẫn đề tài <span style='color:#0f0'>{project['title']}</span>.</p>
     <p>Click vào link dưới để xem chi tiết (em có thể phải thực hiện đăng nhập bằng tài khoản của mình).<br/>
       <a href='{__BASE_URL}/student.html'>{__BASE_URL}/student.html</a>
     </p>
@@ -81,13 +81,13 @@ def notifyStudentAdvisorReject(idAdvisor, idProject):
   __sendmail(receipient, subject, content)
 
 def notifyStudentAdvisorAccept(idAdvisor, idProject):
-  print(f'notifyAdvisorRemoveProject {idAdvisor} {idProject}')
+  print(f'notifyAdvisorAcceptProject {idAdvisor} {idProject}')
   advisor = getAdvisor(idAdvisor)
   project = __getProject(idProject)
   receipient = ",".join(__getMemberEmails(idProject))
-  subject = f'[SRM] Thầy/cô {advisor["fullname"]} đã từ chối hướng dẫn'
+  subject = f'[SRM] Thầy/cô {advisor["fullname"]} đã ĐỒNG Ý hướng dẫn'
   content = f"""
-    <p>Thầy/cô {advisor['fullname']} đã từ chối hướng dẫn đề tài <span style='color:#0f0'>{project['title']}</span>.</p>
+    <p>Thầy/cô {advisor['fullname']} đã ĐỒNG Ý hướng dẫn đề tài <span style='color:#0f0'>{project['title']}</span>.</p>
     <p>Click vào link dưới để xem chi tiết (em có thể phải thực hiện đăng nhập bằng tài khoản của mình).<br/>
       <a href='{__BASE_URL}/student.html'>{__BASE_URL}/student.html</a>
     </p>
