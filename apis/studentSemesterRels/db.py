@@ -9,6 +9,7 @@ from ..projects import Project
 from ..students import Student
 from ..projectStudentRels import Projectstudentrel
 from ..projecttypes import Projecttype
+from ..quotas import Quota
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
@@ -110,9 +111,9 @@ def __doFind(model):
 
   queryStr = """
     SELECT prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, k.className, 
-      GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors,
-      GROUP_CONCAT(IFNULL(guest.affiliation, 'DHCN') SEPARATOR ',') as affiliations,
-      prj.titleConfirm
+      GROUP_CONCAT(CONCAT(quo.name, ". ", adv.fullname) SEPARATOR ', ') as advisors,
+      GROUP_CONCAT(IFNULL(guest.affiliation, 'DHCN') SEPARATOR ', ') as affiliations,
+      IFNULL(prj.titleConfirm, 0) as titleConfirm
     FROM projecttype as pt
       RIGHT JOIN project as prj
         ON prj.idProjecttype = pt.idProjecttype
@@ -132,6 +133,8 @@ def __doFind(model):
         ON prjAdv.idAdvisor = adv.idAdvisor
       LEFT JOIN guestadvisor as guest
         ON adv.idGuestadvisor = guest.idGuestadvisor
+      LEFT JOIN quota as quo
+        ON adv.idQuota = quo.idQuota
   """
   queryStr += whereClause
   groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, k.className, prj.titleConfirm'
