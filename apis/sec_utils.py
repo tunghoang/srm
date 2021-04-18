@@ -1,6 +1,31 @@
 from .db_utils import DbInstance
 from .app_utils import doParseJWT, doLog
 from werkzeug.exceptions import *
+
+def isStaff(request, session): 
+  jwt = jwtFromRequest(request)
+  key = keyFromRequest(request)
+  salt = session[key]
+  print(jwt + " " + key)
+  sessionData = doParseJWT(jwt, salt)
+  doLog(sessionData)
+  if sessionData.get('idStaff', None) is not None:
+    return True
+  else:
+    return False
+
+def isIdGuestAdvisorMatched(request, session, idGuestAdvisor):
+  jwt = jwtFromRequest(request)
+  key = keyFromRequest(request)
+  salt = session[key]
+  print(jwt + " " + key)
+  sessionData = doParseJWT(jwt, salt)
+  doLog(sessionData)
+  if sessionData.get('idGuestadvisor', None) == idGuestAdvisor:
+    return True
+  else:
+    return False
+
 def jwtFromRequest(request):
   jwt = request.cookies.get('jwt')
   jwt = jwt if jwt is not None else request.headers.get('authorization')

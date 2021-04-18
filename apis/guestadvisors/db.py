@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
 from ..app_utils import *
+from ..sec_utils import isStaff, isIdGuestAdvisorMatched
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
@@ -162,13 +163,21 @@ def getGuestadvisor(id):
 def updateGuestadvisor(id, model):
   doLog("update DAO function. Model: {}".format(model))
   try:
-    return __doUpdate(id, model)
+    if 'password' in model:
+      model['password'] = doHash(model['password']);
+    if isStaff(request, session) or isIdGuestAdvisorMatched(request, session, id):
+      return __doUpdate(id, model)
+    else:
+      raise BadRequest("Not allowed")
   except OperationalError as e:
     doLog(e)
     __recover()
     return __doUpdate(id, model)
   except SQLAlchemyError as e:
     __db.session().rollback()
+    raise e
+  except Exception as e:
+    doLog(str(e))
     raise e
 
 def deleteGuestadvisor(id):
