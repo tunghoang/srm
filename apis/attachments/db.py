@@ -7,6 +7,8 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+import os
+
 __db = DbInstance.getInstance()
 
 
@@ -88,6 +90,7 @@ def __doUpdate(id, model):
   return instance
 def __doDelete(id):
   instance = getAttachment(id)
+  os.remove(instance.uuid)
   __db.session().delete(instance)
   __db.session().commit()
   return instance
