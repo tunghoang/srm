@@ -274,7 +274,7 @@ namespaces:
     uniques:
       - keys:
         - name: idProject
-        - name: idStudent
+        - name: idOwner
     list_api: list attachments
     list_api_description: list attachments
     new_api: create attachment
