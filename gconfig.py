@@ -3,3 +3,4 @@ workers = 1
 worker_class = 'sync'
 threads = 16
 reload = True
+preload_app = True

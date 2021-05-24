@@ -42,25 +42,26 @@ def getIdStudentsOfProject(idProject):
   results = __db.session().execute(sql, {'idProject':idProject}).fetchall();
   return list(map(lambda x: int(x[0]) if x[0] is not None else None, results))
 
-def getRelatedIdStudents(body):
-  idStudent = body.get('idStudent', None)
-  idProject = body.get('idProject', None)
+def getRelatedIdStudents(idStudent, idProject):
   if idStudent is not None:
     return ( int(idStudent), )
   elif idProject is not None:
     return getIdStudentsOfProject(idProject)
 
-def validateStudent(request, sessionData):
-  if request.method in ( 'PUT', 'POST' ):
-    body = request.get_json()
-    relatedIdStudents = getRelatedIdStudents(body)
-    sessionIdStudent = sessionData.get('idStudent', None)
-    doLog(relatedIdStudents)
-    doLog(sessionIdStudent)
-    if sessionIdStudent in relatedIdStudents :
-      pass
-    else:
-      raise Exception("Wrong idStudent")
+def validateStudent(request, idStudent, idProject, session):
+  relatedIdStudents = getRelatedIdStudents(idStudent, idProject)
+  jwt = jwtFromRequest(request)
+  key = keyFromRequest(request)
+  salt = session[key]
+  print(jwt + " " + key)
+  sessionData = doParseJWT(jwt, salt)
+  sessionIdStudent = sessionData.get('idStudent', None)
+  doLog(relatedIdStudents)
+  doLog(sessionIdStudent)
+  if sessionIdStudent in relatedIdStudents :
+    pass
+  else:
+    raise BadRequest("Wrong idStudent")
 
 def checkKLTNExist(idStudent):
   __db = DbInstance.getInstance()

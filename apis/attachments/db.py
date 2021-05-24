@@ -6,7 +6,7 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
-
+from ..sec_utils import *
 import os
 
 __db = DbInstance.getInstance()
@@ -23,6 +23,7 @@ class Attachment(__db.Base):
   uploadDate = Column(DateTime)
 
   constraints = list()
+  constraints.append(UniqueConstraint('idProject','idOwner'))
   if len(constraints) > 0:
     __table_args__ = tuple(constraints)
  
@@ -83,6 +84,7 @@ def __doGet(id):
 
 def __doUpdate(id, model):
   instance = getAttachment(id)
+  validateStudent(request, instance.idOwner, instance.idProject, session)
   if instance == None:
     return {}
   instance.update(model)
@@ -90,7 +92,11 @@ def __doUpdate(id, model):
   return instance
 def __doDelete(id):
   instance = getAttachment(id)
-  os.remove(instance.uuid)
+  validateStudent(request, instance.idOwner, instance.idProject, session)
+  try:
+    os.remove(instance.uuid)
+  except Exception as e:
+    doLog(f'Error delete file: {e}', 1);
   __db.session().delete(instance)
   __db.session().commit()
   return instance
