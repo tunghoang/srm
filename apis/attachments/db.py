@@ -17,9 +17,10 @@ class Attachment(__db.Base):
   __tablename__ = "attachment"
   idAttachment = Column(Integer, primary_key = True)
   title = Column(String(255))
-  uuid = Column(String(50))
+  uuid = Column(String(512))
   idProject = Column(Integer, ForeignKey('project.idProject'))
   idOwner = Column(Integer, ForeignKey('student.idStudent'))
+  advisorApproved = Column(Boolean)
   uploadDate = Column(DateTime)
 
   constraints = list()
@@ -38,15 +39,17 @@ class Attachment(__db.Base):
       self.idProject = dictModel["idProject"]
     if ("idOwner" in dictModel) and (dictModel["idOwner"] != None):
       self.idOwner = dictModel["idOwner"]
+    if ("advisorApproved" in dictModel) and (dictModel["advisorApproved"] != None):
+      self.advisorApproved = dictModel["advisorApproved"]
     if ("uploadDate" in dictModel) and (dictModel["uploadDate"] != None):
       self.uploadDate = dictModel["uploadDate"]
 
   def __repr__(self):
-    return '<Attachment idAttachment={} title={} uuid={} idProject={} idOwner={} uploadDate={} >'.format(self.idAttachment, self.title, self.uuid, self.idProject, self.idOwner, self.uploadDate, )
+    return '<Attachment idAttachment={} title={} uuid={} idProject={} idOwner={} advisorApproved={} uploadDate={} >'.format(self.idAttachment, self.title, self.uuid, self.idProject, self.idOwner, self.advisorApproved, self.uploadDate, )
 
   def json(self):
     return {
-      "idAttachment":self.idAttachment,"title":self.title,"uuid":self.uuid,"idProject":self.idProject,"idOwner":self.idOwner,"uploadDate":self.uploadDate,
+      "idAttachment":self.idAttachment,"title":self.title,"uuid":self.uuid,"idProject":self.idProject,"idOwner":self.idOwner,"advisorApproved":self.advisorApproved,"uploadDate":self.uploadDate,
     }
 
   def update(self, dictModel):
@@ -60,6 +63,8 @@ class Attachment(__db.Base):
       self.idProject = dictModel["idProject"]
     if ("idOwner" in dictModel) and (dictModel["idOwner"] != None):
       self.idOwner = dictModel["idOwner"]
+    if ("advisorApproved" in dictModel) and (dictModel["advisorApproved"] != None):
+      self.advisorApproved = dictModel["advisorApproved"]
     if ("uploadDate" in dictModel) and (dictModel["uploadDate"] != None):
       self.uploadDate = dictModel["uploadDate"]
 
