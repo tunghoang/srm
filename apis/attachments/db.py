@@ -22,7 +22,7 @@ class Attachment(__db.Base):
   uploadDate = Column(DateTime)
 
   constraints = list()
-  constraints.append(UniqueConstraint('idProject','idStudent'))
+  constraints.append(UniqueConstraint('idProject','idOwner'))
   if len(constraints) > 0:
     __table_args__ = tuple(constraints)
  
