@@ -7,6 +7,7 @@ def create_model(api):
     'uuid': String,
     'idProject': Integer,
     'idOwner': Integer,
+    'advisorApproved': Boolean,
     'uploadDate': DateTime 
   },mask='*');
   return model

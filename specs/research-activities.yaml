@@ -260,15 +260,21 @@ namespaces:
         type_specs: (255)
       - name: uuid
         type: String
-        type_specs: (50)
+        type_specs: (512)
       - name: idProject
         type: Integer
         foreign_key: project.idProject
       - name: idOwner
         type: Integer
         foreign_key: student.idStudent
+      - name: advisorApproved
+        type: Boolean
       - name: uploadDate
         type: DateTime
+    uniques:
+      - keys:
+        - name: idProject
+        - name: idStudent
     list_api: list attachments
     list_api_description: list attachments
     new_api: create attachment
