@@ -368,6 +368,35 @@ namespaces:
     delete_api_description: delete student semester relationship
     find_api: find student semester rels
     find_api_description: find student semester rels
+  - ns_name: projectReviewerRels
+    ns_description: project-Reviewer Relationship
+    resource_name: projectReviewerrRel
+    props:
+      - name: idProjectreviewerrel
+        type: Integer
+        primary_key: yes
+      - name: idReviewer
+        type: Integer
+        foreign_key: advisor.idAdvisor
+      - name: idProject
+        type: Integer
+        foreign_key: project.idProject
+      - name: status
+        type: Integer
+    uniques:
+      - keys:
+        - name: idProject
+        - name: idReviewer
+    list_api: list project reviewer rel
+    list_api_description: list project reviewer rels
+    new_api: create project reviewer rel
+    new_api_description: create project reviewer rel
+    update_api: edit project reviewer rel
+    update_api_description: edit project reviewer rel
+    delete_api: delete project reviewer rel
+    delete_api_description: delete project reviewer rel
+    find_api: find projectreviewer rels
+    find_api_description: find projectreviewer rels
   - ns_name: stafflogin
     ns_description: login for staff
     resource_name: stafflogin
