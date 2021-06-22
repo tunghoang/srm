@@ -3,6 +3,7 @@ from apis import api
 from apis.db_utils import DbInstance
 from apis.app_utils import *
 from flask_session import Session
+from flask_cors import CORS
 from werkzeug.exceptions import *
 from werkzeug.contrib.fixers import ProxyFix
 import os
@@ -19,10 +20,12 @@ app.config['JSON_AS_ASCII'] = False
 app.config['SERVER_NAME'] = os.getenv("SERVER_NAME","localhost:8000")
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = __SESSION_DIR
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
 #app.config['SESSION_COOKIE_SECURE'] = True
 app.secret_key = os.urandom(16)
 api.init_app(app)
 
+CORS(app)
 Session(app)
 
 @app.before_request
@@ -34,7 +37,7 @@ def before_request():
   jwt = jwt if jwt is not None else request.headers.get('authorization')
   no_auth_routes = ('/', '/favicon.ico', '/swagger.json' )
   #no_auth_prefixes = ( '/swaggerui', '/')
-  no_auth_prefixes = ( '/swaggerui', '/studentlogin', '/stafflogin', '/advisorlogin', '/guestlogin', '/upload' )
+  no_auth_prefixes = ( '/swaggerui', '/studentlogin', '/stafflogin', '/advisorlogin', '/guestlogin', '/download770307' )
 
   if request.path in no_auth_routes or matchOneOf(request.path, no_auth_prefixes) :
     return None

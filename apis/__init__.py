@@ -39,8 +39,11 @@ from .studentlogin import create_api as create_studentlogin
 api.add_namespace(create_studentlogin())
 from .logout import create_api as create_logout
 api.add_namespace(create_logout())
-from .upload import uploadApi
+from .upload import uploadApi,downloadApi
 api.add_namespace(uploadApi)
+api.add_namespace(downloadApi)
+from .email_data import emailDataApi
+api.add_namespace(emailDataApi)
 from .exports import exportAdvisorApi,exportStudentSemesterApi,recordCheckpointApi
 api.add_namespace(exportAdvisorApi)
 api.add_namespace(exportStudentSemesterApi)

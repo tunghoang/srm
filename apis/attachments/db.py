@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
 from ..app_utils import *
+from ..mail_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 from ..sec_utils import *
@@ -89,11 +90,17 @@ def __doGet(id):
 
 def __doUpdate(id, model):
   instance = getAttachment(id)
-  validateStudent(request, instance.idOwner, instance.idProject, session)
   if instance == None:
     return {}
+  sessionData = None
+  if model.get('advisorApproved', None) is not None:
+     sessionData = shouldNotStudent(request, session)
+  else:
+     validateStudent(request, instance.idOwner, instance.idProject, session)
   instance.update(model)
   __db.session().commit()
+  if sessionData is not None and sessionData.get('idAdvisor', None) is not None:
+    notifyStudentsAdvisorApproved(instance.idProject, sessionData.get('idAdvisor', None))
   return instance
 def __doDelete(id):
   instance = getAttachment(id)
@@ -162,13 +169,18 @@ def updateAttachment(id, model):
   try:
     return __doUpdate(id, model)
   except OperationalError as e:
-    doLog(e)
+    doLog(e, 1)
     __recover()
     return __doUpdate(id, model)
   except SQLAlchemyError as e:
+    print('======================')
+    print(e)
     __db.session().rollback()
     raise e
-
+  except Exception as e:
+    print('----------------------')
+    print(e)
+    raise e
 def deleteAttachment(id):
   doLog("delete DAO function", id)
   try:

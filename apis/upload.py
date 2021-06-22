@@ -3,7 +3,9 @@ from flask_restplus import Namespace, Resource, reqparse
 from werkzeug import datastructures
 from werkzeug.exceptions import *
 from .app_utils import *
+from .mail_utils import *
 import os 
+import traceback
 import calendar;
 import time;
 from datetime import datetime
@@ -64,7 +66,7 @@ def findSemesterId(idProject):
 
 def processAttachment(idProject, idStudent, dataFile, destination, filename):
   __db = DbInstance.getInstance()
-  destPath = os.path.join(destination, filename)
+  destPath = os.path.join(destination, idStudent + '_' + filename)
   params = {
     'title': filename,
     'uuid': destPath,
@@ -73,11 +75,10 @@ def processAttachment(idProject, idStudent, dataFile, destination, filename):
     'uploadDate': datetime.now()
   }
 
-  dataFile.save(destPath)
   try:
     __db.session().execute("""
-      INSERT INTO attachment(title, uuid, idProject, idOwner, uploadDate) 
-      VALUES(:title, :uuid, :idProject, :idOwner, :uploadDate)
+      INSERT INTO attachment(title, uuid, idProject, idOwner, uploadDate, advisorApproved) 
+      VALUES(:title, :uuid, :idProject, :idOwner, :uploadDate, 0)
     """, params)
   except Exception as e:
     print(str(e))
@@ -86,13 +87,15 @@ def processAttachment(idProject, idStudent, dataFile, destination, filename):
     if len(results) > 0:
       try:
         os.remove(results[0][0])
-      except:
+      except Exception as e:
+        print(e)
         pass;
       __db.session().execute("""
-        UPDATE attachment SET title=:title, uuid=:uuid, uploadDate=:uploadDate 
+        UPDATE attachment SET title=:title, uuid=:uuid, uploadDate=:uploadDate, advisorApproved=0
         WHERE idProject=:idProject AND idOwner=:idOwner
       """, params)
     __db.session().commit()
+  dataFile.save(destPath)
 
 @uploadApi.route('/attachment')
 class AttachmentUploader(Resource):
@@ -119,23 +122,29 @@ class AttachmentUploader(Resource):
       filename = os.path.join(destination, args['attach_file'].filename)
       doLog(filename)
       processAttachment(args['idProject'], args['idStudent'], args['attach_file'], destination, args['attach_file'].filename)
+      notifyAdvisorStudentUpload(args['idProject'])
     except Exception as e:
+      print('-----------------')
       print(str(e))
-      raise e
+      traceback.print_exc()
+      raise BadRequest(str(e))
     return {"status": "success"}
 
 @uploadApi.route('/attachment/<int:id>')
 class AttachmentManager(Resource):
   @uploadApi.doc("download attachment")
   def get(self, id):
+    doLog(f'Download attachment {id}', True)
     try:
       __db = DbInstance.getInstance()
       results = __db.session().execute("SELECT uuid FROM attachment WHERE idAttachment=:idAttachment", {'idAttachment': id}).fetchall()
       if len(results) > 0:
+        doLog(f'Download attachment file {results[0][0]}', True)
         return send_file(results[0][0])
       
     except Exception as e:
-      print(str(e))
+      print(e)
+      traceback.print_exc()
     raise BadRequest("Cannot download")
 
   @uploadApi.doc("delete attachment")
@@ -162,3 +171,20 @@ class AttachmentManager(Resource):
       print(str(e))
       __db.session().rollback()
 
+downloadApi = Namespace('download770307', 'download attachment api')
+@downloadApi.route('/attachment/<int:id>')
+class DownloadAttachment(Resource):
+  @downloadApi.doc("download attachment")
+  def get(self, id):
+    doLog(f'Download attachment {id}', True)
+    try:
+      __db = DbInstance.getInstance()
+      results = __db.session().execute("SELECT uuid FROM attachment WHERE idAttachment=:idAttachment", {'idAttachment': id}).fetchall()
+      if len(results) > 0:
+        doLog(f'Download attachment file {results[0][0]}', True)
+        return send_file(results[0][0])
+      
+    except Exception as e:
+      print(e)
+      traceback.print_exc()
+    raise BadRequest("Cannot download")

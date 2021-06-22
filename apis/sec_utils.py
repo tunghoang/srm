@@ -135,6 +135,7 @@ def shouldNotStudent(request, session):
     pass
   else:
     raise BadRequest("Insufficient privilege")
+  return sessionData
 
 def shouldBeStaff(request, session):
   jwt = jwtFromRequest(request)

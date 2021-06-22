@@ -64,6 +64,21 @@ def __getMemberEmails(idProject):
   except Exception as e:
     print(e)
 
+def __getAdvisors(idProject):
+  try:
+    __db = DbInstance.getInstance()
+    sql = '''
+      SELECT adv.email, adv.fullname
+      FROM advisor adv LEFT JOIN projectAdvisorRel par ON adv.idAdvisor = par.idAdvisor
+      WHERE par.idProject = :idProject
+    '''
+    params = {"idProject": idProject}
+    results = __db.session().execute(sql, params).fetchall()
+    __db.session().commit()
+    return list(map(lambda x: x[0], results))
+  except Exception as e:
+    print(e)
+
 def notifyStudentAdvisorReject(idAdvisor, idProject):
   print(f'notifyAdvisorRemoveProject {idAdvisor} {idProject}')
   advisor = getAdvisor(idAdvisor)
@@ -95,3 +110,31 @@ def notifyStudentAdvisorAccept(idAdvisor, idProject):
     <p>Văn phòng khoa CNTT, ĐHCN, ĐHQGHN</p>
   """
   __sendmail(receipient, subject, content)
+def notifyAdvisorStudentUpload(idProject):
+  print(f'notifyAdvisorStudentUpload {idProject}')
+  advisors = __getAdvisors(idProject)
+  project = __getProject(idProject)
+  receipient = ",".join(advisors)
+  subject = f'[SRM] Yêu cầu Thầy/Cô kiểm tra và phê duyệt tài liệu tải lên'
+  content = f"""
+    <p>Dự án <span style='color:#0f0'>{project['title']}</span> Thầy/cô đang hướng dẫn có một tài liệu mới được tải lên. Thầy/Cô cần kiểm tra và phê duyệt (approve) tài liệu này trên ứng dụng quản lý tại <a href='{__BASE_URL}/advisor.html'>{__BASE_URL}/advisor.html</a></p>
+    <p>Trân trọng</p>
+    <p>Văn phòng khoa CNTT, ĐHCN, ĐHQGHN</p>
+  """
+  __sendmail(receipient, subject, content)
+
+def notifyStudentsAdvisorApproved(idProject, idAdvisor):
+  advisor = getAdvisor(idAdvisor)
+  project = __getProject(idProject)
+  receipient = ",".join(__getMemberEmails(idProject))
+  subject = f'[SRM] Thầy/cô {advisor["fullname"]} đã phê duyệt tài liệu'
+  content = f"""
+    <p>Thầy/cô {advisor['fullname']} đã phê duyệt tài liệu tải lên của dự án <span style='color:#0f0'>{project['title']}</span>.</p>
+    <p>Click vào link dưới để xem chi tiết (em có thể phải thực hiện đăng nhập bằng tài khoản của mình).<br/>
+      <a href='{__BASE_URL}/student.html'>{__BASE_URL}/student.html</a>
+    </p>
+    <p>Trân trọng</p>
+    <p>Văn phòng khoa CNTT, ĐHCN, ĐHQGHN</p>
+  """
+  __sendmail(receipient, subject, content)
+

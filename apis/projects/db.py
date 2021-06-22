@@ -184,10 +184,13 @@ def __doFind(model):
   queryStr = """
     SELECT prj.title, prj.status, pt.name, sem.year, sem.semesterIndex, prj.idProject, JSON_ARRAYAGG(prjAdv.status) as confirmeds,
       GROUP_CONCAT(adv.fullname SEPARATOR ',') as advisors, stu.fullname as members, stu.studentNumber as MSSV,
-      JSON_ARRAYAGG(adv.idAdvisor) as advisorIds, stu.idStudent as idStudent, prj.titleConfirm as titleConfirm
+      JSON_ARRAYAGG(adv.idAdvisor) as advisorIds, stu.idStudent as idStudent, prj.titleConfirm as titleConfirm,
+      att.idAttachment, att.advisorApproved, att.title as attTitle
     FROM projecttype as pt
       RIGHT JOIN project as prj
         ON prj.idProjecttype = pt.idProjecttype
+      LEFT JOIN attachment as att
+        ON prj.idProject = att.idProject
       LEFT JOIN projectStudentRel as prjStu 
         ON prj.idProject = prjStu.idProject
       LEFT JOIN student as stu
@@ -200,7 +203,7 @@ def __doFind(model):
         ON prjAdv.idAdvisor = adv.idAdvisor
   """
   queryStr += whereClause
-  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, sem.year, sem.semesterIndex, prj.idProject, stu.fullname, stu.studentNumber, stu.idStudent, prj.titleConfirm'
+  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, sem.year, sem.semesterIndex, prj.idProject, stu.fullname, stu.studentNumber, stu.idStudent, prj.titleConfirm, att.idAttachment, att.advisorApproved, att.title'
 
   queryStr += groupbyClause
   queryStr = "SELECT * FROM (" + queryStr + ") q " + whereClause1
@@ -209,86 +212,8 @@ def __doFind(model):
 
   results = __db.session().execute(queryStr, params).fetchall()
   __db.session().commit()
-  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'semester_year': x[3], 'semester_semesterIndex': x[4], 'idProject':x[5], 'confirmeds': x[6], 'advisors': x[7], 'student':x[8], 'studentNumber': x[9], 'idAdvisors': x[10], 'titleConfirm':x[12]}, results))
+  return list(map(lambda x: {'project_title': x[0], 'project_status': x[1], 'project_type': x[2], 'semester_year': x[3], 'semester_semesterIndex': x[4], 'idProject':x[5], 'confirmeds': x[6], 'advisors': x[7], 'student':x[8], 'studentNumber': x[9], 'idAdvisors': x[10], 'titleConfirm':x[12], 'idAttachment': x[13], 'advisorApproved': x[14], 'attachmentTitle': x[15]}, results))
 
-def __doFind1(model):
-  if 'idAdvisor' in model:
-    queryObj = __db.session().query(
-      Project.idProject, 
-      Project.title, 
-      Project.status, 
-      Project.grade, 
-      Project.idSemester,
-      Project.idProjecttype,
-      Semester.year, Semester.semesterIndex,
-      Projecttype.name,
-      Projectadvisorrel.idProjectadvisorrel,
-      Projectadvisorrel.idAdvisor,
-      Projectadvisorrel.status,
-      Advisor.fullname
-    ).filter(
-      Project.idSemester == Semester.idSemester,
-      Project.idProjecttype == Projecttype.idProjecttype,
-      Project.idProject == Projectadvisorrel.idProject,
-      Projectadvisorrel.idAdvisor == Advisor.idAdvisor
-    )
-    queryObj = queryObj.filter(Projectadvisorrel.idAdvisor == model['idAdvisor'])
-  elif 'idStudent' in model:
-    queryObj = __db.session().query(
-      Project.idProject, 
-      Project.title, 
-      Project.status, 
-      Project.grade, 
-      Project.idSemester,
-      Project.idProjecttype,
-      Semester.year, Semester.semesterIndex,
-      Projecttype.name,
-      Projectstudentrel.idProjectstudentrel,
-      Projectstudentrel.idStudent,
-      Projectstudentrel.status,
-      Student.fullname, Student.studentNumber
-    ).filter(
-      Project.idSemester == Semester.idSemester,
-      Project.idProjecttype == Projecttype.idProjecttype,
-      Project.idProject == Projectstudentrel.idProject,
-      Projectstudentrel.idStudent == Student.idStudent
-    )
-    queryObj = queryObj.filter(Projectstudentrel.idStudent == model['idStudent'])
-  else:
-    queryObj = __db.session().query(
-      Project.idProject, 
-      Project.title, 
-      Project.status, 
-      Project.grade, 
-      Project.idSemester,
-      Project.idProjecttype,
-      Semester.year, Semester.semesterIndex,
-      Projecttype.name
-    ).filter(
-      Project.idSemester == Semester.idSemester,
-      Project.idProjecttype == Projecttype.idProjecttype
-    )
-
-  if 'title' in model:
-    queryObj = queryObj.filter(Project.title.ilike(f'%{model["title"]}%'))
-  if 'status' in model:
-    queryObj = queryObj.filter(Project.status == model['status'])
-  if 'idSemester' in model:
-    queryObj = queryObj.filter(Project.idSemester == model['idSemester'])
-  if 'idProjecttype' in model:
-    queryObj = queryObj.filter(Project.idProjecttype == model['idProjecttype'])
-
-  results = queryObj.all()
-
-  if 'idAdvisor' in model:
-    return list(map(lambda x: {
-      'idProject': x[0], 'title': x[1], 'status': x[2], 'grade': x[3], 'idSemester': x[4], 'idProjecttype': x[5], 'year': x[6],
-      'semesterIndex': x[7], 'projecttypeName': x[8], 'confirmed': x[11]
-    }, results))
-  return list(map(lambda x: {
-    'idProject': x[0], 'title': x[1], 'status': x[2], 'grade': x[3], 'idSemester': x[4], 'idProjecttype': x[5], 'year': x[6],
-    'semesterIndex': x[7], 'projecttypeName': x[8] 
-  }, results))
 
 def listProjects():
   doLog("list DAO function")
@@ -377,5 +302,6 @@ def findProject(model):
     __recover()
     return __doFind(model)
   except SQLAlchemyError as e:
+    doLog(e, True);
     __db.session().rollback()
     raise e

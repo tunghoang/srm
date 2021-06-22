@@ -113,10 +113,12 @@ def __doFind(model):
     SELECT prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, k.className, 
       GROUP_CONCAT(CONCAT(quo.name, ". ", adv.fullname) SEPARATOR ', ') as advisors,
       GROUP_CONCAT(IFNULL(guest.affiliation, 'DHCN') SEPARATOR ', ') as affiliations,
-      IFNULL(prj.titleConfirm, 0) as titleConfirm
+      IFNULL(prj.titleConfirm, 0) as titleConfirm, att.idAttachment, att.advisorApproved, att.title as attTitle
     FROM projecttype as pt
       RIGHT JOIN project as prj
         ON prj.idProjecttype = pt.idProjecttype
+      LEFT JOIN attachment as att
+        ON prj.idProject = att.idProject
       RIGHT JOIN projectStudentRel as prjStu 
         ON prj.idProject = prjStu.idProject
       LEFT JOIN student as stu
@@ -137,7 +139,7 @@ def __doFind(model):
         ON adv.idQuota = quo.idQuota
   """
   queryStr += whereClause
-  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, k.className, prj.titleConfirm'
+  groupbyClause = '\n GROUP BY prj.title, prj.status, pt.name, stu.studentNumber, stu.fullname, sem.year, sem.semesterIndex, stuSem.idStudentSemesterRel, stu.dob, k.className, prj.titleConfirm, att.idAttachment, att.advisorApproved, att.title'
   queryStr += groupbyClause
   queryStr = """
     SELECT *,
@@ -165,7 +167,10 @@ def __doFind(model):
     'semester_year': x[5], 
     'semester_semesterIndex': x[6], 
     'idStudentSemesterRel': x[7],
-    'titleConfirm': x[12]
+    'titleConfirm': x[12],
+    'idAttachment': x[13],
+    'advisorApproved': x[14],
+    'attachmentTitle': x[15]
   }, results))
 
 
