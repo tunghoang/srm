@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy import ForeignKey, Column, BigInteger, Integer, Float, String, Boolean, Date, DateTime, Text
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *

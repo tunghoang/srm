@@ -133,10 +133,14 @@ namespaces:
       - name: gender
         type: Boolean
       - name: klass
-        type: String(20)
+        type: String
+        type_specs: (20)
       - name: idKlass
         type: Integer
         foreign_key: klass.idKlass
+      - name: mobile
+        type: String
+        type_specs: (20)
     list_api: list students
     list_api_description: list students
     new_api: create student
