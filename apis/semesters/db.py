@@ -16,6 +16,7 @@ class Semester(__db.Base):
   idSemester = Column(Integer, primary_key = True)
   year = Column(Integer)
   semesterIndex = Column(Integer)
+  active = Column(Boolean)
 
   constraints = list()
   if len(constraints) > 0:
@@ -28,13 +29,15 @@ class Semester(__db.Base):
       self.year = dictModel["year"]
     if ("semesterIndex" in dictModel) and (dictModel["semesterIndex"] != None):
       self.semesterIndex = dictModel["semesterIndex"]
+    if ("active" in dictModel) and (dictModel["active"] != None):
+      self.active = dictModel["active"]
 
   def __repr__(self):
-    return '<Semester idSemester={} year={} semesterIndex={} >'.format(self.idSemester, self.year, self.semesterIndex, )
+    return '<Semester idSemester={} year={} semesterIndex={} active={} >'.format(self.idSemester, self.year, self.semesterIndex, self.active, )
 
   def json(self):
     return {
-      "idSemester":self.idSemester,"year":self.year,"semesterIndex":self.semesterIndex,
+      "idSemester":self.idSemester,"year":self.year,"semesterIndex":self.semesterIndex,"active":self.active,
     }
 
   def update(self, dictModel):
@@ -44,6 +47,8 @@ class Semester(__db.Base):
       self.year = dictModel["year"]
     if ("semesterIndex" in dictModel) and (dictModel["semesterIndex"] != None):
       self.semesterIndex = dictModel["semesterIndex"]
+    if ("active" in dictModel) and (dictModel["active"] != None):
+      self.active = dictModel["active"]
 
 def __recover():
   __db.newSession()
