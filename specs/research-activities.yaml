@@ -185,6 +185,8 @@ namespaces:
         type: Integer
       - name: semesterIndex
         type: Integer
+      - name: active
+        type: Boolean
     list_api: list semesters
     list_api_description: list semesters
     new_api: create semester
