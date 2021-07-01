@@ -1,3 +1,4 @@
+import traceback
 import os
 from sqlalchemy import ForeignKey, Column, BigInteger, Integer, Float, String, Boolean, Date, DateTime, Text
 from sqlalchemy.schema import UniqueConstraint
@@ -63,31 +64,35 @@ def __doNew(instance):
   if not success:
     raise BadRequest(data)
   else:
-    studentRecord = data
-    student = __db.session().query(Student).filter(Student.studentNumber == uid).first()
-    if student is None:
-      student = Student({
-        'studentNumber': uid,
-        'email': instance.email,
-        'fullname': studentRecord['fullname'],
-        'dob': studentRecord['dob'],
-        'gender': studentRecord['gender']
-      })
-      __db.session().add(student)
-    key = doHash(str(instance.email))
-    salt = os.urandom(20)
-    session[key] = salt
-    doLog(student.json())
-    jwt = doGenJWT(student.json(), salt)
-    @after_this_request
-    def finalize(response):
-      response.set_cookie('key', key)
-      response.set_cookie('jwt', jwt)
-      response.headers['x-key'] = key
-      response.headers['x-jwt'] = jwt
-      return response
+    try:
+      studentRecord = data
+      student = __db.session().query(Student).filter(Student.studentNumber == uid).first()
+      if student is None:
+        student = Student({
+          'studentNumber': uid,
+          'email': instance.email,
+          'fullname': studentRecord['fullname'],
+          'dob': studentRecord['dob'],
+          'gender': studentRecord['gender']
+        })
+        __db.session().add(student)
+      key = doHash(str(instance.email))
+      salt = os.urandom(20)
+      session[key] = salt
+      doLog(student.json())
+      jwt = doGenJWT(student.json(), salt)
+      @after_this_request
+      def finalize(response):
+        response.set_cookie('key', key)
+        response.set_cookie('jwt', jwt)
+        response.headers['x-key'] = key
+        response.headers['x-jwt'] = jwt
+        return response
 
-    return student
+      return student
+    except Exception as e:
+      traceback.print_exc()
+      raise BadRequest(e)
 
 def __doUpdate(id, model):
   return {}
