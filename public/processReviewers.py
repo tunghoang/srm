@@ -67,7 +67,7 @@ for row in rows:
   else:
     addToEmails(prj, key)
 
-outFile = open('data.json', 'w', encoding='utf-8')
+outFile = open('reviewer.json', 'w', encoding='utf-8')
 emailArray = toArray(emails)
 outFile.write(json.dumps(emailArray, ensure_ascii=False))
 outFile.close();  

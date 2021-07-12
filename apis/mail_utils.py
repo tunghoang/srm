@@ -3,7 +3,7 @@ from .advisors.db import getAdvisor
 from datetime import datetime
 import requests
 
-__BASE_URL = 'http://fit.uet.vnu.edu.vn:3333/static'
+__BASE_URL = 'https://fit.uet.vnu.edu.vn/static'
 def __sendmail(receipient, subject, content):
   print(f"send to {str(receipient)} - {subject} - {content}")
   url = 'http://fit.uet.vnu.edu.vn:8001/mails/'

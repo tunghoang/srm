@@ -36,3 +36,10 @@ def init_routes(api, model):
       '''delete semester'''
       return deleteSemester(id)
     pass
+
+  @api.route('/complete/<int:id>')
+  class CompInstance(Resource):
+    @api.doc('complete a semester with id')
+    def get(self, id):
+      '''complete a semester whose idSemester=id'''
+      return completeSemester(id)

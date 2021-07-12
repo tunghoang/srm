@@ -1,3 +1,4 @@
+import traceback
 from sqlalchemy import ForeignKey, Column, BigInteger, Integer, Float, String, Boolean, Date, DateTime, Text
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
@@ -168,3 +169,25 @@ def findSemester(model):
   except SQLAlchemyError as e:
     __db.session().rollback()
     raise e
+
+def completeSemester(idSemester):
+  sql = '''
+  update project set status="finished" where idProject in (
+    SELECT distinct att.idProject 
+    FROM attachment att
+      INNER JOIN projectStudentRel psr ON att.idProject = psr.idProject
+      INNER JOIN studentSemesterRel ssr ON psr.idStudent = ssr.idStudent
+      INNER JOIN projectAdvisorRel par ON att.idProject = par.idProject
+    WHERE ssr.idSemester = :idSemester 
+      AND par.status > 0
+      AND att.advisorApproved is TRUE
+  )
+'''
+  try:
+    __db.session().execute(sql, {'idSemester': idSemester})
+    __db.session().commit()
+    return {'message': 'Success'}
+  except Exception as e:
+    traceback.print_exc()
+    __db.session().rollback()
+    raise BadRequest(e)

@@ -64,7 +64,7 @@ for row in rows:
     continue
   addToCommittees(prj, key, row)
 
-outFile = open('data.json', 'w', encoding='utf-8')
+outFile = open('committee.json', 'w', encoding='utf-8')
 emailArray = toArray(committees)
 outFile.write(json.dumps(emailArray, ensure_ascii=False))
 outFile.close();  

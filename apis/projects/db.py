@@ -164,6 +164,9 @@ def __doFind(model):
   if model.get('idProjecttype', None) != None:
     whereClause += " AND pt.idProjecttype = :idProjecttype"
     params['idProjecttype'] = model['idProjecttype']
+  if model.get('idSemester', None) != None:
+    whereClause += " AND prj.idSemester = :idSemester"
+    params['idSemester'] = model['idSemester']
   if model.get('status', None) != None:
     whereClause += " AND prj.status = :status"
     params['status'] = model['status']
