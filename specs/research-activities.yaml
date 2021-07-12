@@ -141,6 +141,9 @@ namespaces:
       - name: mobile
         type: String
         type_specs: (20)
+    uniques:
+      - keys:
+        - name: studentNumber
     list_api: list students
     list_api_description: list students
     new_api: create student

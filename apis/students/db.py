@@ -24,6 +24,7 @@ class Student(__db.Base):
   mobile = Column(String(20))
 
   constraints = list()
+  constraints.append(UniqueConstraint('studentNumber'))
   if len(constraints) > 0:
     __table_args__ = tuple(constraints)
  
