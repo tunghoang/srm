@@ -141,6 +141,8 @@ namespaces:
       - name: mobile
         type: String
         type_specs: (20)
+      - name: notified
+        type: Boolean
     uniques:
       - keys:
         - name: studentNumber

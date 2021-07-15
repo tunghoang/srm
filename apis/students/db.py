@@ -22,6 +22,7 @@ class Student(__db.Base):
   klass = Column(String(20))
   idKlass = Column(Integer, ForeignKey('klass.idKlass'))
   mobile = Column(String(20))
+  notified = Column(Boolean)
 
   constraints = list()
   constraints.append(UniqueConstraint('studentNumber'))
@@ -47,13 +48,15 @@ class Student(__db.Base):
       self.idKlass = dictModel["idKlass"]
     if ("mobile" in dictModel) and (dictModel["mobile"] != None):
       self.mobile = dictModel["mobile"]
+    if ("notified" in dictModel) and (dictModel["notified"] != None):
+      self.notified = dictModel["notified"]
 
   def __repr__(self):
-    return '<Student idStudent={} studentNumber={} email={} fullname={} dob={} gender={} klass={} idKlass={} mobile={} >'.format(self.idStudent, self.studentNumber, self.email, self.fullname, self.dob, self.gender, self.klass, self.idKlass, self.mobile, )
+    return '<Student idStudent={} studentNumber={} email={} fullname={} dob={} gender={} klass={} idKlass={} mobile={} notified={} >'.format(self.idStudent, self.studentNumber, self.email, self.fullname, self.dob, self.gender, self.klass, self.idKlass, self.mobile, self.notified, )
 
   def json(self):
     return {
-      "idStudent":self.idStudent,"studentNumber":self.studentNumber,"email":self.email,"fullname":self.fullname,"dob":self.dob,"gender":self.gender,"klass":self.klass,"idKlass":self.idKlass,"mobile":self.mobile,
+      "idStudent":self.idStudent,"studentNumber":self.studentNumber,"email":self.email,"fullname":self.fullname,"dob":self.dob,"gender":self.gender,"klass":self.klass,"idKlass":self.idKlass,"mobile":self.mobile,"notified":self.notified,
     }
 
   def update(self, dictModel):
@@ -75,6 +78,8 @@ class Student(__db.Base):
       self.idKlass = dictModel["idKlass"]
     if ("mobile" in dictModel) and (dictModel["mobile"] != None):
       self.mobile = dictModel["mobile"]
+    if ("notified" in dictModel) and (dictModel["notified"] != None):
+      self.notified = dictModel["notified"]
 
 def __recover():
   __db.newSession()
