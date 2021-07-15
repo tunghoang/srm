@@ -204,3 +204,12 @@ def findStudent(model):
     raise e
   except Exception as e:
     raise BadRequest(f"Error: {e}")
+
+def sendNotification(student):
+  shouldBeStaff(request, session)
+  doLog(f"send email notification for student {student['studentNumber']}")
+  try:
+    notify4IncompleteProfile(student)
+    return {success: true}
+  except Exception as e:
+    raise BadRequest(str(e))

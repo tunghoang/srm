@@ -138,3 +138,22 @@ def notifyStudentsAdvisorApproved(idProject, idAdvisor):
   """
   __sendmail(receipient, subject, content)
 
+def notify4IncompleteProfile(student):
+  receipient = student['email']
+  subject = f'[SRM] Yêu cầu sinh viên hoàn thiện thông tin cá nhân'
+  content = f"""
+    <p>Thân gửi em,</p>
+    <p>
+      Hiện nay trên hệ thống <a href='https://fit.uet.vnu.edu.vn/static/student.html'>SRM</a>, thông tin cá nhân của em chưa được cập nhật đầy đủ, đề nghị em khẩn trương cập nhật:
+      <ul>
+        <li>Họ và tên</li>
+        <li>Lớp</li>
+        <li>Mobile</li>
+      </ul>
+    </p>
+    <p>
+      Chúc các em học tập tốt
+    </p>
+  """
+  __sendmail(receipient, subject, content)
+

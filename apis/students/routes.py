@@ -36,3 +36,10 @@ def init_routes(api, model):
       '''delete student'''
       return deleteStudent(id)
     pass
+  @api.route('/sendNotification')
+  class StudentSendNotification(Resource):
+    @api.doc('send notification', body=model)
+    @api.expect(model)
+    def post(self):
+      '''send notification for student'''
+      return sendNotification(api.payload)
