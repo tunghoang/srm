@@ -10,6 +10,7 @@ def create_model(api):
     'gender': Boolean,
     'klass': String,
     'idKlass': Integer,
-    'mobile': String 
+    'mobile': String,
+    'notified': Boolean 
   },mask='*');
   return model
