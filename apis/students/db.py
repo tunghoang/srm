@@ -216,6 +216,7 @@ def sendNotification(student):
   doLog(f"send email notification for student {student['studentNumber']}")
   try:
     notify4IncompleteProfile(student)
-    return {success: true}
+    student['notified'] = True
+    return updateStudent(student['idStudent'], student)
   except Exception as e:
     raise BadRequest(str(e))
