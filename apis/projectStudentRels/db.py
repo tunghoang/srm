@@ -15,8 +15,8 @@ __db = DbInstance.getInstance()
 class Projectstudentrel(__db.Base):
   __tablename__ = "projectStudentRel"
   idProjectstudentrel = Column(Integer, primary_key = True)
-  idStudent = Column(Integer, nullable=False, ForeignKey('student.idStudent'))
-  idProject = Column(Integer, nullable=False, ForeignKey('project.idProject'))
+  idStudent = Column(Integer, ForeignKey('student.idStudent'), nullable=False)
+  idProject = Column(Integer, ForeignKey('project.idProject'), nullable=False)
   status = Column(Integer)
 
   constraints = list()
