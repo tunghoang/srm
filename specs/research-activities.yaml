@@ -306,9 +306,11 @@ namespaces:
       - name: idStudent
         type: Integer
         foreign_key: student.idStudent
+        notnull: yes
       - name: idProject
         type: Integer
         foreign_key: project.idProject
+        notnull: yes
       - name: status
         type: Integer
     uniques:
@@ -335,9 +337,11 @@ namespaces:
       - name: idAdvisor
         type: Integer
         foreign_key: advisor.idAdvisor
+        notnull: yes
       - name: idProject
         type: Integer
         foreign_key: project.idProject
+        notnull: yes
       - name: status
         type: Integer
     uniques:

@@ -19,8 +19,8 @@ __db = DbInstance.getInstance()
 class Projectadvisorrel(__db.Base):
   __tablename__ = "projectAdvisorRel"
   idProjectadvisorrel = Column(Integer, primary_key = True)
-  idAdvisor = Column(Integer, ForeignKey('advisor.idAdvisor'))
-  idProject = Column(Integer, ForeignKey('project.idProject'))
+  idAdvisor = Column(Integer, nullable=False, ForeignKey('advisor.idAdvisor'))
+  idProject = Column(Integer, nullable=False, ForeignKey('project.idProject'))
   status = Column(Integer)
 
   constraints = list()
