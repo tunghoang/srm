@@ -14,6 +14,12 @@ from .sec_utils import *
 from .configs.db import findConfig
 
 parser = reqparse.RequestParser()
+parser.add_argument('idSemester',
+  type=int,
+  location="form",
+  required=True,
+  help="current semester id"
+)
 parser.add_argument(
   'xlsx_file',
   type=datastructures.FileStorage,
@@ -21,6 +27,21 @@ parser.add_argument(
   required=True,
   help='XLSX file'
 )
+
+def addStudentToSemester(stdObj, idSemester, dbSession):
+  doLog(str(stdObj) + str(idSemester))
+  try:
+    students = dbSession.execute("SELECT idStudent from student where studentNumber=:studentNumber", stdObj).fetchall()
+    if len(students) < 1:
+      doLog(f"{stdObj['studentNumber']} does not exist", 1)
+      return
+    dbSession.execute("""
+      INSERT INTO studentSemesterRel (idSemester, idStudent, removed) values (:idSemester, :idStudent, :removed)
+    """, {'idSemester': idSemester, 'idStudent': students[0]['idStudent'], 'removed': not stdObj['allow']});
+    dbSession.commit()
+  except Exception as e:
+    dbLog(str(e), 1)
+    dbSession.rollback()
 
 uploadApi = Namespace('upload', "upload list of student for each semester")
 @uploadApi.route('/studentSemesterXlsx')
@@ -32,6 +53,7 @@ class StudentSemesterXlsx(Resource):
     doLog(request.files)
     args = parser.parse_args()
     doLog(args['xlsx_file'])
+    doLog(args['idSemester'])
     if args['xlsx_file'].mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
       destination = config.get('Default','data_path', fallback='/tmp/')
       if not os.path.exists(destination):
@@ -41,7 +63,8 @@ class StudentSemesterXlsx(Resource):
       filename = destination + args['xlsx_file'].filename
       doLog(args['xlsx_file'])
       doLog(filename)
-      processStudentListUpload(args['xlsx_file'].stream, doLog)
+      __db = DbInstance.getInstance()
+      processStudentListUpload(args['xlsx_file'].stream, lambda x: addStudentToSemester(x, args['idSemester'], __db))
       #args['xlsx_file'].save(filename)
     else:
       raise BadRequest("Request is malformed")
@@ -49,10 +72,12 @@ class StudentSemesterXlsx(Resource):
 
 attachmentUploadParser = reqparse.RequestParser()
 attachmentUploadParser.add_argument(
-  'idProject', type = 'int', location='files', required=True, help = 'project id'
+  #'idProject', type = 'int', location='files', required=True, help = 'project id'
+  'idProject', type = 'int', required=True, help = 'project id'
 )
 attachmentUploadParser.add_argument(
-  'idStudent', type = 'int', location='files', required=True, help = 'student id'
+  #'idStudent', type = 'int', location='files', required=True, help = 'student id'
+  'idStudent', type = 'int', required=True, help = 'student id'
 )
 attachmentUploadParser.add_argument(
   'attach_file', type = datastructures.FileStorage, location='files', required=True, help = 'attachment'

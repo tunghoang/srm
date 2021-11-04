@@ -63,12 +63,12 @@ def buildAdvisorRecordFromLDAPAttrs(attrs):
 def processStudentListUpload(path, callbackFn):
   data = read_excel(
     path, 
-    sheet_name=config.get('Excel', 'sheet_name', fallback=2), 
-    skiprows=int(config.get('Excel', 'skiprows', fallback=3))
+    sheet_name=config.get('Excel', 'sheet_name', fallback=0), 
+    skiprows=int(config.get('Excel', 'skiprows', fallback=1))
   )
   values = data._values
   for row in values:
-    rowObj = { 'studentNumber': int(row[1]), "allow": True if row[7] == 'ok' else False }
+    rowObj = { 'studentNumber': int(row[1]), "allow": False if row[7] == 'no' else True }
     callbackFn(rowObj)
 
 def toDataFrame(objList):

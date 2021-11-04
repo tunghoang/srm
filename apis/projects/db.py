@@ -5,7 +5,7 @@ from sqlalchemy.exc import *
 from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
-from flask import session,request,after_this_request
+from flask import session,request,after_this_request,send_from_directory
 
 from ..projectStudentRels import Projectstudentrel
 from ..projectAdvisorRels import Projectadvisorrel
@@ -308,3 +308,15 @@ def findProject(model):
     doLog(e, True);
     __db.session().rollback()
     raise e
+
+def exportMatchedProjects(model):
+  doLog('exportMachedProjects %s' % model)
+  try:
+    projects = findProject(model)
+    df = toDataFrame(projects)
+    df.to_excel('public/projects.xlsx', index=False, engine='xlsxwriter')
+    doLog('Before sending file')
+    return send_from_directory('public', 'projects.xlsx')
+  except Exception as e:
+    doLog('Exception %s ' % str(e), True);
+    raise BadRequest(str(e))

@@ -36,3 +36,10 @@ def init_routes(api, model):
       '''delete project'''
       return deleteProject(id)
     pass
+  @api.route('/exportXLSX')
+  class ExportInstance(Resource):
+    @api.doc('Export projects')
+    #@api.expect(model)
+    def put(self):
+      '''export projects'''
+      return exportMatchedProjects(api.payload)

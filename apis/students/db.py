@@ -1,3 +1,4 @@
+import traceback
 from sqlalchemy import ForeignKey, Column, BigInteger, Integer, Float, String, Boolean, Date, DateTime, Text
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
@@ -7,6 +8,7 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+from ..mail_utils import notify4IncompleteProfile
 from ..sec_utils import *
 __db = DbInstance.getInstance()
 
@@ -217,6 +219,8 @@ def sendNotification(student):
   try:
     notify4IncompleteProfile(student)
     student['notified'] = True
-    return updateStudent(student['idStudent'], student)
+    result = updateStudent(student['idStudent'], student)
+    return result.json()
   except Exception as e:
+    traceback.print_exc()
     raise BadRequest(str(e))
