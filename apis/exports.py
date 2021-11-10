@@ -6,6 +6,7 @@ from .app_utils import *
 import os 
 import calendar;
 import time;
+import traceback
 from .db_utils import DbInstance
 from .advisors.db import dumpAdvisors
 
@@ -22,7 +23,23 @@ def findActiveSemester() :
     return result[0][0]
   else:
     raise BadRequest("Semester not exists")
-  
+
+def findProject(idSemester):
+  __db = DbInstance.getInstance()
+  queryStr = """
+    SELECT prj.idProject, prj.title, stu.fullname, stu.studentNumber
+    FROM project prj 
+      INNER JOIN projectStudentRel psr
+        ON prj.idProject = psr.idProject
+      INNER JOIN student stu
+        ON psr.idStudent = stu.idStudent
+    WHERE idSemester = :idSemester
+    ORDER BY prj.idProject
+  """
+  doLog(queryStr)
+  result = __db.session().execute(queryStr, {'idSemester': idSemester}).fetchall()
+  __db.session().commit()
+  return result  
 
 exportAdvisorApi = Namespace('exportAdvisors', "export all advisor to excel")
 @exportAdvisorApi.route('/')
@@ -49,38 +66,41 @@ class XlsxExportStudentSemester(Resource):
     return send_from_directory('public', 'studentSemester.xlsx')
 
 recordCheckpointApi = Namespace('checkpoint', 'record checkpoint')
-@recordCheckpointApi.route('/')
+@recordCheckpointApi.route('/<int:id>')
 class CheckpointRecorder(Resource):
   @recordCheckpointApi.doc("Record checkpoint to csv file - begin")
-  def get(self):
+  def get(self, id):
     try:
-      id = findActiveSemester()
       doLog("record checkpoint for semester " + str(id))
-      results = findStudentsemesterrel({'idSemester':id})
+      results = findProject(id)
       df = toDataFrame(results)
-      df.to_csv('checkpoints/studentSemester-begin.csv', sep="|")
+      df.to_csv(f'checkpoints/studentSemester-{id}-begin.csv', sep="|")
       return {'msg': "checkpoint recorded"}
     except Exception as e:
       print(str(e))
+      traceback.print_exc()
       raise(e)
 
   @recordCheckpointApi.doc("Record checkpoint to csv file - end")
-  def post(self):
+  def post(self, id):
     try:
-      id = findActiveSemester()
       doLog("record checkpoint for semester " + str(id))
-      results = findStudentsemesterrel({'idSemester':id})
+      results = findProject(id)
       df = toDataFrame(results)
-      df.to_csv('checkpoints/studentSemester-end.csv', sep="|")
+      df.to_csv(f'checkpoints/studentSemester-{id}-end.csv', sep="|")
       return {'msg': "checkpoint recorded"}
     except Exception as e:
       print(str(e))
+      traceback.print_exc()
       raise(e)
   @recordCheckpointApi.doc("Compare checkpoints")
-  def put(self):
+  def put(self, id):
     try:
-      os.system('diff checkpoints/studentSemester-begin.csv checkpoints/studentSemester-end.csv | grep -E "(>|<)" > public/checkpoint-diff.csv')
-      return send_from_directory('public', 'checkpoint-diff.csv')
+      doLog("Compare checkpoint for semester " + str(id))
+      os.system(f'diff checkpoints/studentSemester-{id}-begin.csv checkpoints/studentSemester-{id}-end.csv | grep -E "(>|<)" > public/checkpoint-{id}-diff.csv')
+      doLog("diff is done")
+      return send_from_directory('public', f'checkpoint-{id}-diff.csv')
     except Exception as e:
       print(str(e))
+      traceback.print_exc()
       raise(e)

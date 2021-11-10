@@ -295,6 +295,19 @@ def deleteProject(id):
     __db.session().rollback()
     raise e
 
+def unsafeFindProject(model):
+  doLog("find DAO function %s" % model)
+  try:
+    return __doFind(model)
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doFind(model)
+  except SQLAlchemyError as e:
+    doLog(e, True);
+    __db.session().rollback()
+    raise e
+  
 def findProject(model):
   verifyIdStudent(request, session, request.get_json())
   doLog("find DAO function %s" % model)
