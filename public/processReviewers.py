@@ -14,15 +14,13 @@ sql1 = '''
 select 
 	stu.fullname, stu.studentNumber, psRel.idProject, prj.title, att.idAttachment, att.title
 FROM student stu 
-	LEFT JOIN studentSemesterRel ssRel
-	ON stu.idStudent = ssRel.idStudent
 	LEFT JOIN projectStudentRel psRel
 	ON stu.idStudent = psRel.idStudent
 	LEFT JOIN project prj
 	ON psRel.idProject = prj.idProject
 	RIGHT JOIN attachment att
 	ON prj.idProject = att.idProject
-WHERE ssRel.idStudentsemesterrel = :idSsr
+WHERE prj.idProject = :idPrj
 '''
 
 emails = dict()
@@ -43,10 +41,10 @@ def toArray(emails):
 
 for row in rows:
   advStr = str(row[6]).replace('\n', '/')
-  project = session.execute(sql1, {'idSsr': str(row[10]).strip()}).fetchall()
+  project = session.execute(sql1, {'idPrj': str(row[10]).strip()}).fetchall()
   #print(f"{str(row[14])} - {str(row[15])}")
-  if str(row[14]) != "nan" or str(row[15]) != "nan":
-    print(f"{str(row[14])} - {str(row[15])}")
+  if str(row[14]) != "nan":
+    print(f"{str(row[14])}")
     logFile.write(f"{row[0]}\t{row[1]}\t{row[2]}\t{advStr}\tError: Khong bao ve\n")
     continue
   elif len(project) == 0:
